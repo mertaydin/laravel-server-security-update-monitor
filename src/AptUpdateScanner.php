@@ -13,6 +13,8 @@ class AptUpdateScanner
             throw new RuntimeException('APT package manager is not available on this server.');
         }
 
+        $this->updatePackageLists();
+
         $result = Process::timeout((int) config('server-security-update-monitor.command_timeout', 30))
             ->run('apt list --upgradable 2>/dev/null');
 
@@ -58,6 +60,32 @@ class AptUpdateScanner
             'security_updates' => count(array_filter($packages, fn ($package) => $package['is_security'])),
             'packages' => $packages,
         ];
+    }
+
+    /**
+     * Refresh APT metadata only. This deliberately never upgrades or installs packages.
+     */
+    private function updatePackageLists(): void
+    {
+        if (! config('server-security-update-monitor.apt.update_package_lists', true)) {
+            return;
+        }
+
+        $command = ['/usr/bin/apt-get', 'update'];
+
+        // PHP-FPM/Artisan commonly run as www-data. Permit only this exact command
+        // through a narrowly scoped sudoers rule; never fall back to interactive sudo.
+        if (! function_exists('posix_geteuid') || posix_geteuid() !== 0) {
+            $command = ['/usr/bin/sudo', '-n', ...$command];
+        }
+
+        $result = Process::timeout((int) config('server-security-update-monitor.apt.update_timeout', 300))
+            ->run($command);
+
+        if (! $result->successful()) {
+            $details = trim($result->errorOutput() ?: $result->output());
+            throw new RuntimeException('Unable to run apt-get update. Ensure the PHP process has permission to execute only /usr/bin/apt-get update. '.$details);
+        }
     }
 
     private function isSecuritySuite(string $suite): bool
