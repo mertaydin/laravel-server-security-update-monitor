@@ -59,11 +59,11 @@ jobs:
           php artisan migrate --force
           cat >> routes/web.php <<'PHP'
           Route::get('/__screenshot-login', function () {
-              $user = \\App\\Models\\User::firstOrCreate(
+              $user = App\\Models\\User::firstOrCreate(
                   ['email' => 'screenshots@example.test'],
                   ['name' => 'Screenshot', 'password' => bcrypt('temporary-screenshot-password')]
               );
-              \\Illuminate\\Support\\Facades\\Auth::login($user);
+              Illuminate\\Support\\Facades\\Auth::login($user);
               request()->session()->regenerate();
               return redirect('/server-security-monitor');
           });
