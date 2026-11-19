@@ -1,3 +1,8 @@
+## [0.1.8] - 2026-11-19
+
+- Fix malformed PHP array syntax and mismatched quotation marks in Turkish, English and Arabic translation files.
+- Extend CI PHP syntax validation to include all language files.
+
 ## [0.1.7] - 2026-11-19
 
 - Fix the dashboard Blade ParseError caused by an incorrectly escaped Carbon class reference.
