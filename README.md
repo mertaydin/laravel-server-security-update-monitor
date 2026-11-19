@@ -127,3 +127,7 @@ MIT. See [LICENSE](LICENSE).
 - [Changelog](CHANGELOG.md)
 - [GitHub releases](https://github.com/mertaydin/laravel-server-security-update-monitor/releases)
 - [Issues](https://github.com/mertaydin/laravel-server-security-update-monitor/issues)
+
+---
+
+**Dil / Language:** [Türkçe README](README.tr.md) · [English README](README.md)
