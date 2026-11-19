@@ -1,8 +1,13 @@
+## [0.1.6] - 2026-11-19
+
+- Replace Gate-based dashboard authorization with the `ServerSecurityUpdateMonitor::auth()` callback API.
+- Add an illustrative dashboard preview image to the README.
+
 ## [0.1.5] - 2026-11-19
 
 - Add light, dark and system appearance preferences.
 - Add six dashboard languages with session-based language selection.
-- Add an optional Laravel Gate authorization hook and AppServiceProvider example.
+- Add dashboard authorization configuration.
 
 # Changelog
 
