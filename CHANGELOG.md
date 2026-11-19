@@ -1,3 +1,8 @@
+## v0.2.3 - 2026-11-19
+
+- Show a hand cursor when hovering dashboard action buttons, including the APT package-list update button.
+- Keep disabled action buttons visually non-interactive.
+
 ## v0.2.2 - 2026-11-19
 
 - Add the shared security CI baseline: Composer audit, PHPStan/Larastan, changed-file Pint checks, PHP syntax validation, and automated tests.
