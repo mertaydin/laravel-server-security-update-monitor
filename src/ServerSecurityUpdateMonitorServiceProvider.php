@@ -1,9 +1,9 @@
 <?php
 
-namespace MertAydin\ServerSecurityUpdateMonitor;
+namespace MertAydin\\ServerSecurityUpdateMonitor;
 
-use Illuminate\Support\ServiceProvider;
-use MertAydin\ServerSecurityUpdateMonitor\Console\CheckUpdatesCommand;
+use Illuminate\\Support\\ServiceProvider;
+use MertAydin\\ServerSecurityUpdateMonitor\\Console\\CheckUpdatesCommand;
 
 class ServerSecurityUpdateMonitorServiceProvider extends ServiceProvider
 {
@@ -22,6 +22,8 @@ class ServerSecurityUpdateMonitorServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../resources/assets' => public_path('vendor/server-security-update-monitor'),
         ], 'server-security-update-monitor-assets');
+
+        $this->loadTranslationsFrom(__DIR__.'/../lang', 'server-security-update-monitor');
 
         if ($this->app->runningInConsole()) {
             $this->commands([CheckUpdatesCommand::class]);
