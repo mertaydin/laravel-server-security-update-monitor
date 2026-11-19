@@ -46,9 +46,11 @@ use Illuminate\\Support\\Facades\\Gate;
 
 public function boot(): void
 {
-    Gate::define('viewServerSecurityUpdateMonitor', fn ($user) => $user->is_admin);
+    Gate::define('viewServerSecurityUpdateMonitor', fn ($user) => (bool) $user->is_admin);
 }
 ```
+
+The Gate is optional. If it is not registered, the default `web` and `auth` middleware still protect the dashboard.
 
 When this Gate is defined, the package enforces it on dashboard access. Change the ability name with `authorization.gate` in the published configuration. If the Gate is not defined, the default `auth` middleware remains the access control.
 
