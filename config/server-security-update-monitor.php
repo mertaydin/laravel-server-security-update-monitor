@@ -15,4 +15,12 @@ return [
         'enabled' => true,
         'security_suites' => ['-security', '/security'],
     ],
+    'dnf' => [
+        'enabled' => true,
+        'binaries' => ['/usr/bin/dnf', '/usr/bin/yum', '/bin/dnf', '/bin/yum'],
+    ],
+    'apk' => [
+        'enabled' => true,
+        'binary' => '/sbin/apk',
+    ],
 ];
