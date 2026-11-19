@@ -27,4 +27,7 @@ return [
     'disclaimer' => "Güvenlik sınıflandırması APT depo metaverisine dayanır. CVE/USN/DSA eşleşmesi yapılmadıkça önem derecesi bilinmiyor gösterilir. Paket yükseltmeleri bu panelden otomatik uygulanmaz.",
     'scanning' => "Sunucu kontrol ediliyor",
     'scanning_help' => "Paketler ve güvenlik güncellemeleri taranıyor. Lütfen bekleyin.",
+    'update_package_lists' => "Paket listelerini güncelle",
+    'apt_update_success' => "APT paket listeleri başarıyla güncellendi. Güncel sonuçları görmek için şimdi kontrol et'e basın.",
+    'apt_update_failed' => "APT paket listeleri güncellenemedi:",
 ];
