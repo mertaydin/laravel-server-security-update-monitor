@@ -4,11 +4,11 @@ namespace MertAydin\ServerSecurityUpdateMonitor\Http\Controllers;
 
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
-use MertAydin\ServerSecurityUpdateMonitor\AptUpdateScanner;
+use MertAydin\ServerSecurityUpdateMonitor\SystemUpdateScanner;
 
 class DashboardController extends Controller
 {
-    public function __invoke(AptUpdateScanner $scanner)
+    public function __invoke(SystemUpdateScanner $scanner)
     {
         $locale = session('server_security_update_monitor_locale', config('app.locale', 'en'));
         $supported = ['tr', 'en', 'ar', 'es', 'hi', 'zh_CN'];
