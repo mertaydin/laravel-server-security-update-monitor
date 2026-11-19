@@ -22,5 +22,5 @@
 <div class="table-wrap"><table><thead><tr><th>Paket</th><th>Kurulu sürüm</th><th>Yeni sürüm</th><th>Kaynak</th><th>Tür</th><th>Önem</th></tr></thead><tbody>
 @foreach($data['packages'] as $package)<tr><td class="pkg">{{ $package['name'] }}</td><td class="muted">{{ $package['installed_version'] ?? '—' }}</td><td>{{ $package['candidate_version'] }}</td><td class="muted">{{ $package['repository'] }}</td><td><span class="pill {{ $package['is_security'] ? 'security' : 'normal' }}">{{ $package['type'] }}</span></td><td><span class="pill {{ $package['is_security'] ? 'security' : 'normal' }}">{{ $package['severity_label'] }}</span></td></tr>@endforeach
 </tbody></table></div>@endif</section>
-<p class="sub" style="margin-top:18px;font-size:12px">Güvenlik sınıflandırması APT depo metaverisine dayanır. Paket yükseltmeleri bu panelden otomatik uygulanmaz.</p>
+<p class="sub" style="margin-top:18px;font-size:12px">Güvenlik sınıflandırması APT depo metaverisine dayanır. CVE/USN/DSA eşleşmesi yapılmadıkça önem derecesi bilinmiyor gösterilir. Paket yükseltmeleri bu panelden otomatik uygulanmaz.</p>
 </main></body></html>
