@@ -1,3 +1,9 @@
+## [0.1.5] - 2026-11-19
+
+- Add light, dark and system appearance preferences.
+- Add six dashboard languages with session-based language selection.
+- Add an optional Laravel Gate authorization hook and AppServiceProvider example.
+
 # Changelog
 
 ## v0.1.4 - 2026-11-19
