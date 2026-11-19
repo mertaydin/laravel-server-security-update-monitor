@@ -23,20 +23,20 @@ class SystemUpdateScanner
             throw new RuntimeException('APK package manager was detected, but APK scanning is not enabled yet.');
         }
 
-        if ($this->isRpmFamily($os) && $this->hasExecutable((array) config('server-security-update-monitor.dnf.binaries', ['/usr/bin/dnf', '/usr/bin/yum', '/bin/dnf', '/bin/yum']))) {
+        if (config('server-security-update-monitor.dnf.enabled', true) && $this->isRpmFamily($os) && $this->hasExecutable((array) config('server-security-update-monitor.dnf.binaries', ['/usr/bin/dnf', '/usr/bin/yum', '/bin/dnf', '/bin/yum']))) {
             return $this->dnf->scan();
         }
 
-        if ($this->isDebianFamily($os) && is_executable('/usr/bin/apt-get')) {
+        if (config('server-security-update-monitor.apt.enabled', true) && $this->isDebianFamily($os) && is_executable('/usr/bin/apt-get')) {
             return $this->apt->scan();
         }
 
         // Fall back to executable package managers when the distribution ID is custom.
-        if ($this->hasExecutable((array) config('server-security-update-monitor.dnf.binaries', ['/usr/bin/dnf', '/usr/bin/yum', '/bin/dnf', '/bin/yum']))) {
+        if (config('server-security-update-monitor.dnf.enabled', true) && $this->hasExecutable((array) config('server-security-update-monitor.dnf.binaries', ['/usr/bin/dnf', '/usr/bin/yum', '/bin/dnf', '/bin/yum']))) {
             return $this->dnf->scan();
         }
 
-        if (is_executable('/usr/bin/apt-get')) {
+        if (config('server-security-update-monitor.apt.enabled', true) && is_executable('/usr/bin/apt-get')) {
             return $this->apt->scan();
         }
 
