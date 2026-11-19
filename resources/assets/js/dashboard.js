@@ -45,8 +45,21 @@
             });
         }
 
+        var aptUpdateForm = document.getElementById('apt-update-form');
         var refreshLink = document.getElementById('refresh-dashboard');
         var overlay = document.getElementById('scan-loading');
+
+        if (aptUpdateForm && overlay) {
+            aptUpdateForm.addEventListener('submit', function () {
+                var button = document.getElementById('apt-update-button');
+                if (button) {
+                    button.disabled = true;
+                    button.dataset.loading = 'true';
+                }
+                overlay.classList.add('is-visible');
+                overlay.setAttribute('aria-hidden', 'false');
+            });
+        }
 
         if (refreshLink && overlay) {
             refreshLink.addEventListener('click', function (event) {
