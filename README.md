@@ -103,7 +103,6 @@ The published `config/server-security-update-monitor.php` file controls:
 | `cache.seconds` | `900` | Cached snapshot lifetime. |
 | `command_timeout` | `30` | APT command timeout in seconds. |
 | `apt.enabled` | `true` | Enables APT scanning. |
-| `apt.update_package_lists` | `true` | Runs exactly `apt-get update` before each uncached APT scan. Set to `false` to use existing local package indexes. |
 | `apt.update_timeout` | `300` | Maximum time in seconds allowed for the manual dashboard `apt-get update` action. |
 | `apt.security_suites` | `-security, /security` | Suite patterns considered security repositories. |
 | `dnf.enabled` | `true` | Enables automatic DNF/YUM detection. |
