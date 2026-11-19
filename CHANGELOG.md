@@ -1,3 +1,7 @@
+## v0.1.16 - 2026-11-19
+
+- Add automated browser capture of the live server security dashboard and update the README screenshot.
+
 ## [0.1.15] - 2026-11-19
 
 - Show the centered loading modal and animated progress bar before submitting the separate APT package-list refresh action.
