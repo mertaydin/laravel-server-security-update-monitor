@@ -32,7 +32,7 @@
 (function(){
 const theme=document.getElementById('theme-select');const saved=localStorage.getItem('ssum-theme')||'system';theme.value=saved;
 theme.addEventListener('change',function(){localStorage.setItem('ssum-theme',this.value);const dark=this.value==='dark'||(this.value==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.theme=dark?'dark':'light';});
-document.getElementById('refresh-dashboard')?.addEventListener('click',function(e){e.preventDefault();document.getElementById('scan-loading')?.classList.add('is-visible');window.location.assign(this.href);});
+const refresh=document.getElementById('refresh-dashboard');const overlay=document.getElementById('scan-loading');if(refresh&&overlay){refresh.addEventListener('click',function(e){e.preventDefault();if(refresh.dataset.loading==='true')return;refresh.dataset.loading='true';refresh.setAttribute('aria-disabled','true');overlay.classList.add('is-visible');overlay.setAttribute('aria-hidden','false');overlay.getBoundingClientRect();const target=refresh.href;window.requestAnimationFrame(function(){window.requestAnimationFrame(function(){window.location.assign(target);});});});}
 })();
 </script>
 </body></html>
