@@ -4,14 +4,14 @@ namespace MertAydin\ServerSecurityUpdateMonitor\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
-use MertAydin\ServerSecurityUpdateMonitor\AptUpdateScanner;
+use MertAydin\ServerSecurityUpdateMonitor\SystemUpdateScanner;
 
 class CheckUpdatesCommand extends Command
 {
     protected $signature = 'server-security-monitor:check';
     protected $description = 'Scan APT for available package and security updates';
 
-    public function handle(AptUpdateScanner $scanner): int
+    public function handle(SystemUpdateScanner $scanner): int
     {
         try {
             $data = $scanner->scan();
