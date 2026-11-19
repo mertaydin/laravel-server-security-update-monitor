@@ -28,6 +28,7 @@ The dashboard provides an at-a-glance view of pending updates and a package tabl
 ```bash
 composer require mertaydin/laravel-server-security-update-monitor
 php artisan vendor:publish --tag=server-security-update-monitor-config
+php artisan vendor:publish --tag=server-security-update-monitor-assets
 ```
 
 Open `/server-security-monitor` while authenticated. The default route middleware is `web` and `auth`; add an application-specific administrator check or network restriction before exposing operational details.
