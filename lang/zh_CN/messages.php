@@ -27,4 +27,7 @@ return [
     'disclaimer' => "安全分类基于 APT 软件源元数据。没有 CVE/USN/DSA 匹配时，严重程度显示为未知。本面板不会自动安装更新。",
     'scanning' => "正在检查服务器",
     'scanning_help' => "正在扫描软件包和安全更新，请稍候。",
+    'update_package_lists' => "更新软件包列表",
+    'apt_update_success' => "APT 软件包列表已更新。选择立即检查以使用最新元数据进行扫描。",
+    'apt_update_failed' => "无法更新 APT 软件包列表：",
 ];
