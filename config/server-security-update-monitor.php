@@ -13,6 +13,8 @@ return [
     'command_timeout' => 30,
     'apt' => [
         'enabled' => true,
+        'update_package_lists' => true,
+        'update_timeout' => 300,
         'security_suites' => ['-security', '/security'],
     ],
     'dnf' => [
