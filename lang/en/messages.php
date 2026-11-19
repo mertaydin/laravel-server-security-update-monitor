@@ -30,4 +30,6 @@ return [
     'update_package_lists' => "Update package lists",
     'apt_update_success' => "APT package lists updated. Select Check now to scan with the latest metadata.",
     'apt_update_failed' => "Unable to update APT package lists:",
+    'updating_package_lists' => "Updating APT package lists",
+    'updating_package_lists_help' => "Refreshing repository metadata. Please wait until the operation is complete."
 ];
