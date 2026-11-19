@@ -1,3 +1,8 @@
+## [0.1.9] - 2026-11-19
+
+- Ensure the centered scan loading dialog and animated progress bar paint before navigating to the refreshed dashboard.
+- Prevent repeated clicks while the server scan is starting.
+
 ## [0.1.8] - 2026-11-19
 
 - Fix malformed PHP array syntax and mismatched quotation marks in Turkish, English and Arabic translation files.
