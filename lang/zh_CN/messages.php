@@ -30,4 +30,6 @@ return [
     'update_package_lists' => "更新软件包列表",
     'apt_update_success' => "APT 软件包列表已更新。选择立即检查以使用最新元数据进行扫描。",
     'apt_update_failed' => "无法更新 APT 软件包列表：",
+    'updating_package_lists' => "正在更新 APT 软件包列表",
+    'updating_package_lists_help' => "正在刷新软件源元数据，请等待操作完成。"
 ];
