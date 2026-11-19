@@ -27,4 +27,7 @@ return [
     'disclaimer' => "La clasificación de seguridad se basa en los metadatos del repositorio APT. La gravedad permanece desconocida sin coincidencia CVE/USN/DSA. No se aplican actualizaciones automáticamente.",
     'scanning' => "Comprobando servidor",
     'scanning_help' => "Analizando paquetes y actualizaciones de seguridad. Espere.",
+    'update_package_lists' => "Actualizar listas de paquetes",
+    'apt_update_success' => "Listas APT actualizadas. Seleccione Comprobar ahora para analizar con los metadatos recientes.",
+    'apt_update_failed' => "No se pudieron actualizar las listas APT:",
 ];
