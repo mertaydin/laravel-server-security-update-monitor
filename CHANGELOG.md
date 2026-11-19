@@ -1,3 +1,9 @@
+## [0.1.13] - 2026-11-19
+
+- Refresh APT package indexes with exactly `apt-get update` before each uncached APT scan.
+- Add configurable APT metadata refresh and timeout settings.
+- Support non-root PHP processes through non-interactive sudo, requiring a narrowly scoped sudoers rule; never run upgrade or install commands.
+
 ## [0.1.12] - 2026-11-19
 
 - Add automatic Linux package-manager detection for Debian/Ubuntu APT and Fedora/RHEL-family DNF/YUM.
