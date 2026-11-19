@@ -9,7 +9,7 @@ use MertAydin\ServerSecurityUpdateMonitor\SystemUpdateScanner;
 class CheckUpdatesCommand extends Command
 {
     protected $signature = 'server-security-monitor:check';
-    protected $description = 'Scan APT for available package and security updates';
+    protected $description = 'Scan the system package manager for available package and security updates';
 
     public function handle(SystemUpdateScanner $scanner): int
     {
