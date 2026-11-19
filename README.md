@@ -1,8 +1,8 @@
 # Laravel Server Security Update Monitor
 
-[![Latest Version](https://img.shields.io/packagist/v/laravel-server-security-update-monitor?label=Packagist)](https://packagist.org/packages/laravel-server-security-update-monitor)
-[![Total Downloads](https://img.shields.io/packagist/dt/laravel-server-security-update-monitor?label=downloads)](https://packagist.org/packages/laravel-server-security-update-monitor)
-[![PHP](https://img.shields.io/packagist/php-v/laravel-server-security-update-monitor?label=PHP)](https://packagist.org/packages/laravel-server-security-update-monitor)
+[![Latest Version](https://img.shields.io/packagist/v/mertaydin/laravel-server-security-update-monitor?label=Packagist)](https://packagist.org/packages/laravel-server-security-update-monitor)
+[![Total Downloads](https://img.shields.io/packagist/dt/mertaydin/laravel-server-security-update-monitor?label=downloads)](https://packagist.org/packages/laravel-server-security-update-monitor)
+[![PHP](https://img.shields.io/packagist/php-v/mertaydin/laravel-server-security-update-monitor?label=PHP)](https://packagist.org/packages/laravel-server-security-update-monitor)
 [![Laravel](https://img.shields.io/badge/Laravel-10%20%7C%2011%20%7C%2012%20%7C%2013-FF2D20?logo=laravel&logoColor=white)](https://laravel.com)
 [![CI](https://github.com/mertaydin/laravel-server-security-update-monitor/actions/workflows/tests.yml/badge.svg?branch=main&label=CI)](https://github.com/mertaydin/laravel-server-security-update-monitor/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
