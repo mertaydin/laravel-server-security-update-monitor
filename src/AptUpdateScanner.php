@@ -42,8 +42,8 @@ class AptUpdateScanner
                 'architecture' => $matches[4],
                 'repository' => $suite,
                 'is_security' => $security,
-                'severity' => $security ? 'high' : 'normal',
-                'severity_label' => $security ? 'High' : 'Normal',
+                'severity' => 'unknown',
+                'severity_label' => $security ? 'Security update; severity not verified' : 'No security advisory matched',
                 'type' => $security ? 'Security update' : 'Package update',
             ];
         }
