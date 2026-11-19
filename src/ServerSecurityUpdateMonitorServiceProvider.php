@@ -19,6 +19,10 @@ class ServerSecurityUpdateMonitorServiceProvider extends ServiceProvider
             __DIR__.'/../config/server-security-update-monitor.php' => config_path('server-security-update-monitor.php'),
         ], 'server-security-update-monitor-config');
 
+        $this->publishes([
+            __DIR__.'/../resources/assets' => public_path('vendor/server-security-update-monitor'),
+        ], 'server-security-update-monitor-assets');
+
         if ($this->app->runningInConsole()) {
             $this->commands([CheckUpdatesCommand::class]);
         }
