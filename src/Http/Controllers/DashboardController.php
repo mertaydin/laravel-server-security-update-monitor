@@ -40,13 +40,13 @@ class DashboardController extends Controller
         return view('server-security-update-monitor::dashboard', compact('data', 'locale'));
     }
 
-    public function updatePackageLists(\\MertAydin\\ServerSecurityUpdateMonitor\\AptUpdateScanner $scanner)
+    public function updatePackageLists(\MertAydin\\ServerSecurityUpdateMonitor\\AptUpdateScanner $scanner)
     {
         try {
             $scanner->updatePackageLists();
             Cache::forget(config('server-security-update-monitor.cache.key'));
             return redirect()->route('server-security-update-monitor.dashboard')->with('apt_update_status', 'success');
-        } catch (\\Throwable $exception) {
+        } catch (\Throwable $exception) {
             return redirect()->route('server-security-update-monitor.dashboard')
                 ->with('apt_update_status', 'error')->with('apt_update_error', $exception->getMessage());
         }
