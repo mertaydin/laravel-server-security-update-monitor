@@ -72,7 +72,7 @@ public function boot(): void
 }
 ```
 
-Erişime izin vermek için `true`, HTTP 403 yanıtı için `false` döndürün. Callback mevcut isteği alır; callback yoksa yapılandırılmış `web` ve `auth` middleware'leri geçerli kalır.
+Erişime izin vermek için `true`, HTTP 403 yanıtı için `false` döndürün. Callback mevcut isteği alır. Callback yoksa erişim HTTP 403 ile reddedilir; yapılandırılmış `web` ve `auth` middleware'leri de geçerlidir.
 
 ## Tarama
 
