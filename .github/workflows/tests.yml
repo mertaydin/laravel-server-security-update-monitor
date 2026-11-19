@@ -17,6 +17,8 @@ jobs:
           coverage: none
       - name: Validate Composer manifest
         run: composer validate --no-check-publish
+      - name: Check dashboard JavaScript syntax
+        run: node --check resources/assets/js/dashboard.js
       - name: Check PHP syntax
         run: |
           find src config routes lang -type f -name '*.php' -print0 | xargs -0 -n1 php -l
