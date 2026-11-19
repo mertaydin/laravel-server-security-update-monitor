@@ -51,7 +51,7 @@
     "laravel/pint": "^1.0"
   },
   "scripts": {
-    "test": "phpunit",
+    "test": "phpunit tests",
     "format": "pint --test"
   }
 }
