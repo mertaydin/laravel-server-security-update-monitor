@@ -1,3 +1,9 @@
+## [0.1.10] - 2026-11-19
+
+- Fix language switching by replacing the inline onchange handler with a registered JavaScript event listener.
+- Fix light/dark/system theme switching and make localStorage failures non-blocking.
+- Version the dashboard stylesheet URL to prevent stale published CSS from being reused.
+
 ## [0.1.9] - 2026-11-19
 
 - Ensure the centered scan loading dialog and animated progress bar paint before navigating to the refreshed dashboard.
