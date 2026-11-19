@@ -1,10 +1,10 @@
 <?php
 
-namespace MertAydin\\ServerSecurityUpdateMonitor\\Http\\Controllers;
+namespace MertAydin\ServerSecurityUpdateMonitor\Http\Controllers;
 
-use Illuminate\\Routing\\Controller;
-use Illuminate\\Support\\Facades\\Cache;
-use MertAydin\\ServerSecurityUpdateMonitor\\AptUpdateScanner;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Cache;
+use MertAydin\ServerSecurityUpdateMonitor\AptUpdateScanner;
 
 class DashboardController extends Controller
 {
@@ -24,7 +24,7 @@ class DashboardController extends Controller
             try {
                 $data = $scanner->scan();
                 Cache::put($key, $data, (int) config('server-security-update-monitor.cache.seconds', 900));
-            } catch (\\Throwable $exception) {
+            } catch (\Throwable $exception) {
                 $data = [
                     'host' => gethostname() ?: 'unknown',
                     'package_manager' => 'APT',
