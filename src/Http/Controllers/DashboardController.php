@@ -45,7 +45,6 @@ class DashboardController extends Controller
     {
         try {
             $scanner->updatePackageLists();
-            Cache::forget(config('server-security-update-monitor.cache.key'));
             return redirect()->route('server-security-update-monitor.dashboard')->with('apt_update_status', 'success');
         } catch (\Throwable $exception) {
             return redirect()->route('server-security-update-monitor.dashboard')
