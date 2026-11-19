@@ -7,8 +7,10 @@ A Laravel dashboard for Linux server package updates and security patches. It au
 
 ## Dashboard screenshot
 
+The screenshot is captured from the package's real dashboard in a temporary Laravel application by GitHub Actions.
+
 <p align="center">
-  <img src="docs/images/dashboard-preview.svg" alt="Laravel Server Security Update Monitor dashboard preview" width="100%">
+  <img src="docs/images/dashboard-screenshot.png" alt="Laravel Server Security Update Monitor dashboard preview" width="100%">
 </p>
 
 > Preview uses illustrative package data; the live dashboard displays values collected from your server.
