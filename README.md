@@ -72,7 +72,7 @@ public function boot(): void
 }
 ```
 
-Return `true` to allow access and `false` to respond with HTTP 403. The callback receives the current request; if omitted, the configured `web` and `auth` middleware remain in effect.
+Return `true` to allow access and `false` to respond with HTTP 403. The callback receives the current request. If omitted, access is denied with HTTP 403; the configured `web` and `auth` middleware remain in effect.
 
 ## Scan
 
