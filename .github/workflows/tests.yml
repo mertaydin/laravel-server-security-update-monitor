@@ -15,8 +15,14 @@ jobs:
         with:
           php-version: '8.2'
           coverage: none
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist
+
       - name: Validate Composer manifest
         run: composer validate --no-check-publish
+
+      - name: Run unit tests
+        run: composer test
       - name: Check dashboard JavaScript syntax
         run: node --check resources/assets/js/dashboard.js
       - name: Check PHP syntax
