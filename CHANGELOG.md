@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.1.3 - 2026-11-19
+
+- Reduce the corner radius of the red/yellow package type and importance badges for a less pill-shaped appearance.
+
+
 ## v0.1.2 - 2026-11-19
 
 - Add a dedicated `server-security-update-monitor-assets` publish tag.
