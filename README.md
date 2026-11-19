@@ -31,7 +31,7 @@ The dashboard provides an at-a-glance view of pending updates and a package tabl
 - PHP 8.2+
 - Laravel 10, 11, 12 or 13
 - Debian/Ubuntu with APT and dpkg-query, or Fedora/RHEL-compatible/Amazon Linux with DNF/YUM and RPM.
-- The PHP process must be allowed to execute read-only package inspection commands.
+- The PHP process must be allowed to execute package inspection commands. By default, APT scans also run `apt-get update`; when PHP runs as a non-root user, grant narrowly scoped passwordless sudo permission for `/usr/bin/apt-get update` only.
 
 ## Installation
 
@@ -103,6 +103,8 @@ The published `config/server-security-update-monitor.php` file controls:
 | `cache.seconds` | `900` | Cached snapshot lifetime. |
 | `command_timeout` | `30` | APT command timeout in seconds. |
 | `apt.enabled` | `true` | Enables APT scanning. |
+| `apt.update_package_lists` | `true` | Runs exactly `apt-get update` before each uncached APT scan. Set to `false` to use existing local package indexes. |
+| `apt.update_timeout` | `300` | Maximum time in seconds allowed for `apt-get update`. |
 | `apt.security_suites` | `-security, /security` | Suite patterns considered security repositories. |
 | `dnf.enabled` | `true` | Enables automatic DNF/YUM detection. |
 | `dnf.binaries` | `/usr/bin/dnf`, `/usr/bin/yum`, `/bin/dnf`, `/bin/yum` | DNF/YUM executable candidates. |
@@ -111,7 +113,7 @@ The published `config/server-security-update-monitor.php` file controls:
 ## Safety
 
 - Read-only package inspection only.
-- Does not run `apt-get update`, `apt upgrade`, `apt install`, `dnf upgrade`, `yum update`, `apk upgrade`, or any package installation/removal command.
+- On APT systems, runs only `apt-get update` before an uncached scan (configurable). It never runs `apt upgrade`, `apt install`, `dnf upgrade`, `yum update`, `apk upgrade`, or any package installation/removal command.
 - Does not install, remove, or upgrade packages.
 - Does not infer CVSS severity from repository names or version numbers.
 
