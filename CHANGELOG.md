@@ -1,3 +1,11 @@
+## [0.1.12] - 2026-11-19
+
+- Add automatic Linux package-manager detection for Debian/Ubuntu APT and Fedora/RHEL-family DNF/YUM.
+- Add read-only DNF/YUM update scanning, installed RPM version lookup and vendor security-advisory matching.
+- Support DNF5 executable detection.
+- Show the detected package-manager name in the dashboard and update the Artisan scan command.
+- Document DNF/YUM support, configuration and read-only behavior; keep Alpine APK support planned.
+
 ## [0.1.11] - 2026-11-19
 
 - Move language, theme and manual-scan interactions into a separately published JavaScript asset instead of inline Blade scripts.
