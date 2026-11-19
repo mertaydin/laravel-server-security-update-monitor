@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark light">
 <title>{{ __('server-security-update-monitor::messages.title') }}</title>
-<link rel="stylesheet" href="{{ asset('vendor/server-security-update-monitor/css/dashboard.css') }}?v=0.1.15">
+<link rel="stylesheet" href="{{ asset('vendor/server-security-update-monitor/css/dashboard.css') }}?v=0.1.16">
 <script src="{{ asset('vendor/server-security-update-monitor/js/dashboard.js') }}?v=0.1.14" defer></script>
 </head>
 <body><main class="wrap">
