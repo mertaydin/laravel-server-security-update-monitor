@@ -1,0 +1,96 @@
+name: Capture dashboard screenshot
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/screenshots.yml'
+      - 'README.md'
+      - 'resources/views/**'
+      - 'resources/**/css/**'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: server-security-screenshot
+  cancel-in-progress: true
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, sqlite3, pdo_sqlite
+          tools: composer:v2
+          coverage: none
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Create temporary Laravel host
+        run: composer create-project laravel/laravel screenshot-app '^12.0' --no-interaction
+      - name: Install package and prepare demo host
+        working-directory: screenshot-app
+        run: |
+          composer config repositories.security-monitor '{"type":"path","url":"../","options":{"symlink":false}}'
+          composer require mertaydin/laravel-server-security-update-monitor:@dev --no-interaction
+          php artisan key:generate
+          mkdir -p database && touch database/database.sqlite
+          cat > .env <<'ENV'
+          APP_NAME="Server Security Update Monitor"
+          APP_ENV=local
+          APP_KEY=
+          APP_DEBUG=true
+          APP_URL=http://127.0.0.1:8000
+          LOG_CHANNEL=stack
+          DB_CONNECTION=sqlite
+          DB_DATABASE=database/database.sqlite
+          CACHE_STORE=file
+          SESSION_DRIVER=file
+          ENV
+          php artisan key:generate
+          php artisan vendor:publish --tag=server-security-update-monitor-config --force
+          php artisan vendor:publish --tag=server-security-update-monitor-assets --force
+          sed -i "s/'web', 'auth'/'web'/" vendor/mertaydin/laravel-server-security-update-monitor/routes/web.php
+          npm install --no-audit --no-fund playwright
+          npx playwright install --with-deps chromium
+      - name: Start Laravel
+        working-directory: screenshot-app
+        run: |
+          php artisan serve --host=127.0.0.1 --port=8000 > /tmp/security-monitor.log 2>&1 &
+          for i in $(seq 1 20); do
+            if curl --max-time 2 -fsS http://127.0.0.1:8000/server-security-monitor >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/security-monitor.log
+          cat storage/logs/laravel.log || true
+          exit 1
+      - name: Capture actual package dashboard
+        working-directory: screenshot-app
+        run: |
+          mkdir -p ../docs/images
+          node --input-type=module <<'NODE'
+          import { chromium } from 'playwright';
+          const browser = await chromium.launch({headless:true});
+          const page = await browser.newPage({viewport:{width:1600,height:1100},deviceScaleFactor:1});
+          page.on('pageerror', error => console.error(error));
+          const response = await page.goto('http://127.0.0.1:8000/server-security-monitor',{waitUntil:'networkidle'});
+          if (!response || response.status() >= 400) throw new Error('Dashboard failed: '+response?.status());
+          await page.screenshot({path:'../docs/images/dashboard-screenshot.png',fullPage:true});
+          await browser.close();
+          NODE
+      - name: Commit screenshot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/images/dashboard-screenshot.png
+          if ! git diff --cached --quiet; then
+            git commit -m "docs: capture real server security dashboard"
+            git pull --rebase origin main
+            git push
+          fi
