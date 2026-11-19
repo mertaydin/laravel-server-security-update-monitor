@@ -1,3 +1,9 @@
+## [0.1.11] - 2026-11-19
+
+- Move language, theme and manual-scan interactions into a separately published JavaScript asset instead of inline Blade scripts.
+- Load the external script with a versioned URL so deployments cannot silently keep using stale inline behavior.
+- Add a Node.js syntax check for the dashboard JavaScript to CI.
+
 ## [0.1.10] - 2026-11-19
 
 - Fix language switching by replacing the inline onchange handler with a registered JavaScript event listener.
