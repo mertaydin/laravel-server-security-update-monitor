@@ -14,6 +14,8 @@ The dashboard provides an at-a-glance view of pending updates and a package tabl
 - Installed and candidate package versions.
 - Security updates sorted before routine updates.
 - A manual scan action and cached scan results.
+- Six dashboard languages: Turkish, English, Arabic, Spanish, Hindi and Simplified Chinese.
+- Light, dark and system appearance modes with browser-persisted preference.
 - An Artisan command for scheduled or manual scans.
 
 ## Requirements
