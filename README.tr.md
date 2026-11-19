@@ -2,8 +2,12 @@
 
 Linux sunucularındaki paket güncellemelerini ve güvenlik yamalarını izlemek için Laravel paneli. Debian/Ubuntu üzerinde APT, Fedora, RHEL uyumlu dağıtımlar ve Amazon Linux üzerinde DNF/YUM paket yöneticisini otomatik algılar.
 
-[![Tests](https://github.com/mertaydin/laravel-server-security-update-monitor/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/mertaydin/laravel-server-security-update-monitor/actions/workflows/tests.yml)
-[![License](https://img.shields.io/github/license/mertaydin/laravel-server-security-update-monitor)](LICENSE)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/mertaydin/laravel-server-security-update-monitor?label=Packagist)](https://packagist.org/packages/mertaydin/laravel-server-security-update-monitor)
+[![Total Downloads](https://img.shields.io/packagist/dt/mertaydin/laravel-server-security-update-monitor?label=downloads)](https://packagist.org/packages/mertaydin/laravel-server-security-update-monitor)
+[![PHP Version](https://img.shields.io/packagist/php-v/mertaydin/laravel-server-security-update-monitor?label=PHP)](https://packagist.org/packages/mertaydin/laravel-server-security-update-monitor)
+[![Laravel](https://img.shields.io/badge/Laravel-10%20%7C%2011%20%7C%2012%20%7C%2013-FF2D20?logo=laravel&logoColor=white)](https://laravel.com)
+[![CI](https://github.com/mertaydin/laravel-server-security-update-monitor/actions/workflows/tests.yml/badge.svg?branch=main&label=CI)](https://github.com/mertaydin/laravel-server-security-update-monitor/actions/workflows/tests.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ## Panel ekran görüntüsü
 
