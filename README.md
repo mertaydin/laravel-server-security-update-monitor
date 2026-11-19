@@ -33,6 +33,25 @@ php artisan vendor:publish --tag=server-security-update-monitor-assets
 
 Open `/server-security-monitor` while authenticated. The default route middleware is `web` and `auth`; add an application-specific administrator check or network restriction before exposing operational details.
 
+## Language and appearance
+
+The dashboard supports Turkish, English, Arabic, Spanish, Hindi and Simplified Chinese. Language selection is stored in the current session. Appearance supports light, dark and system themes and is saved in the current browser.
+
+## Access control
+
+The dashboard remains protected by `web` and `auth` middleware. To add an application-specific Gate check, define the following ability in `app/Providers/AppServiceProvider.php`:
+
+```php
+use Illuminate\\Support\\Facades\\Gate;
+
+public function boot(): void
+{
+    Gate::define('viewServerSecurityUpdateMonitor', fn ($user) => $user->is_admin);
+}
+```
+
+When this Gate is defined, the package enforces it on dashboard access. Change the ability name with `authorization.gate` in the published configuration. If the Gate is not defined, the default `auth` middleware remains the access control.
+
 ## Scan
 
 Run a scan manually:
