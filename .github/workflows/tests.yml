@@ -19,4 +19,4 @@ jobs:
         run: composer validate --no-check-publish
       - name: Check PHP syntax
         run: |
-          find src config routes -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+          find src config routes lang -type f -name '*.php' -print0 | xargs -0 -n1 php -l
