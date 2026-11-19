@@ -4,6 +4,7 @@ namespace MertAydin\ServerSecurityUpdateMonitor;
 
 use Illuminate\Support\ServiceProvider;
 use MertAydin\ServerSecurityUpdateMonitor\Console\CheckUpdatesCommand;
+use MertAydin\ServerSecurityUpdateMonitor\Services\DashboardAuthorizer;
 
 class ServerSecurityUpdateMonitorServiceProvider extends ServiceProvider
 {
@@ -11,6 +12,7 @@ class ServerSecurityUpdateMonitorServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/server-security-update-monitor.php', 'server-security-update-monitor');
         $this->app->singleton(AptUpdateScanner::class);
+        $this->app->singleton(DashboardAuthorizer::class);
     }
 
     public function boot(): void
