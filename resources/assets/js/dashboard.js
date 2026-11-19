@@ -50,14 +50,34 @@
         var overlay = document.getElementById('scan-loading');
 
         if (aptUpdateForm && overlay) {
-            aptUpdateForm.addEventListener('submit', function () {
+            aptUpdateForm.addEventListener('submit', function (event) {
+                if (aptUpdateForm.dataset.loading === 'true') {
+                    event.preventDefault();
+                    return;
+                }
+
+                event.preventDefault();
+                aptUpdateForm.dataset.loading = 'true';
+
                 var button = document.getElementById('apt-update-button');
                 if (button) {
                     button.disabled = true;
-                    button.dataset.loading = 'true';
+                    button.setAttribute('aria-disabled', 'true');
                 }
+
+                var title = overlay.querySelector('.loading-dialog h2');
+                var help = overlay.querySelector('.loading-dialog p');
+                if (title && overlay.dataset.updateTitle) { title.textContent = overlay.dataset.updateTitle; }
+                if (help && overlay.dataset.updateHelp) { help.textContent = overlay.dataset.updateHelp; }
+
                 overlay.classList.add('is-visible');
                 overlay.setAttribute('aria-hidden', 'false');
+                window.getComputedStyle(overlay).opacity;
+                window.requestAnimationFrame(function () {
+                    window.requestAnimationFrame(function () {
+                        aptUpdateForm.submit();
+                    });
+                });
             });
         }
 
