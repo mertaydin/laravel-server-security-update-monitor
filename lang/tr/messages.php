@@ -30,4 +30,6 @@ return [
     'update_package_lists' => "Paket listelerini güncelle",
     'apt_update_success' => "APT paket listeleri başarıyla güncellendi. Güncel sonuçları görmek için şimdi kontrol et'e basın.",
     'apt_update_failed' => "APT paket listeleri güncellenemedi:",
+    'updating_package_lists' => "APT paket listeleri güncelleniyor",
+    'updating_package_lists_help' => "Depo bilgileri yenileniyor. Lütfen işlem tamamlanana kadar bekleyin."
 ];
