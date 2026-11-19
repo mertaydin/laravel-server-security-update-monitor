@@ -31,7 +31,7 @@ The dashboard provides an at-a-glance view of pending updates and a package tabl
 - PHP 8.2+
 - Laravel 10, 11, 12 or 13
 - Debian/Ubuntu with APT and dpkg-query, or Fedora/RHEL-compatible/Amazon Linux with DNF/YUM and RPM.
-- The PHP process must be allowed to execute package inspection commands. By default, APT scans also run `apt-get update`; when PHP runs as a non-root user, grant narrowly scoped passwordless sudo permission for `/usr/bin/apt-get update` only.
+- The PHP process must be allowed to execute package inspection commands. APT scans are read-only and use the currently available local package indexes. Refreshing APT indexes is a separate dashboard action; when PHP runs as a non-root user, grant narrowly scoped passwordless sudo permission for `/usr/bin/apt-get update` only.
 
 ## Installation
 
@@ -74,7 +74,7 @@ Run a scan manually:
 php artisan server-security-monitor:check
 ```
 
-The dashboard also scans when no cached snapshot exists. Use your normal server maintenance process to refresh APT package indexes (for example, `apt-get update`). This package does not refresh package indexes automatically.
+The **Check now** action scans using the package indexes already present on the server and does not run `apt-get update`. On APT systems, use the separate **Update package lists** dashboard button when you want to refresh repository metadata. The refresh completes independently; select **Check now** afterward to scan using the new metadata.
 
 ## Security classification and severity
 
@@ -104,7 +104,7 @@ The published `config/server-security-update-monitor.php` file controls:
 | `command_timeout` | `30` | APT command timeout in seconds. |
 | `apt.enabled` | `true` | Enables APT scanning. |
 | `apt.update_package_lists` | `true` | Runs exactly `apt-get update` before each uncached APT scan. Set to `false` to use existing local package indexes. |
-| `apt.update_timeout` | `300` | Maximum time in seconds allowed for `apt-get update`. |
+| `apt.update_timeout` | `300` | Maximum time in seconds allowed for the manual dashboard `apt-get update` action. |
 | `apt.security_suites` | `-security, /security` | Suite patterns considered security repositories. |
 | `dnf.enabled` | `true` | Enables automatic DNF/YUM detection. |
 | `dnf.binaries` | `/usr/bin/dnf`, `/usr/bin/yum`, `/bin/dnf`, `/bin/yum` | DNF/YUM executable candidates. |
@@ -113,7 +113,7 @@ The published `config/server-security-update-monitor.php` file controls:
 ## Safety
 
 - Read-only package inspection only.
-- On APT systems, runs only `apt-get update` before an uncached scan (configurable). It never runs `apt upgrade`, `apt install`, `dnf upgrade`, `yum update`, `apk upgrade`, or any package installation/removal command.
+- APT metadata refresh runs only when the separate dashboard action is explicitly selected. Scans never run `apt-get update`. The refresh action runs only `apt-get update`; it never runs `apt upgrade`, `apt install`, `dnf upgrade`, `yum update`, `apk upgrade`, or any package installation/removal command.
 - Does not install, remove, or upgrade packages.
 - Does not infer CVSS severity from repository names or version numbers.
 
