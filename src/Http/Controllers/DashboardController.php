@@ -5,6 +5,7 @@ namespace MertAydin\ServerSecurityUpdateMonitor\Http\Controllers;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
 use MertAydin\ServerSecurityUpdateMonitor\SystemUpdateScanner;
+use MertAydin\ServerSecurityUpdateMonitor\AptUpdateScanner;
 
 class DashboardController extends Controller
 {
@@ -40,7 +41,7 @@ class DashboardController extends Controller
         return view('server-security-update-monitor::dashboard', compact('data', 'locale'));
     }
 
-    public function updatePackageLists(\MertAydin\\ServerSecurityUpdateMonitor\\AptUpdateScanner $scanner)
+    public function updatePackageLists(AptUpdateScanner $scanner)
     {
         try {
             $scanner->updatePackageLists();
