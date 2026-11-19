@@ -3,18 +3,17 @@
 namespace MertAydin\ServerSecurityUpdateMonitor\Http\Middleware;
 
 use Closure;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
+use MertAydin\ServerSecurityUpdateMonitor\Services\DashboardAuthorizer;
+use Symfony\Component\HttpFoundation\Response;
 
 class AuthorizeDashboard
 {
-    public function handle(Request $request, Closure $next)
-    {
-        $ability = config('server-security-update-monitor.authorization.gate', 'viewServerSecurityUpdateMonitor');
+    public function __construct(private readonly DashboardAuthorizer $authorizer) {}
 
-        if (Gate::has($ability)) {
-            Gate::authorize($ability);
-        }
+    public function handle(Request $request, Closure $next): Response
+    {
+        abort_unless($this->authorizer->allows($request), 403);
 
         return $next($request);
     }
