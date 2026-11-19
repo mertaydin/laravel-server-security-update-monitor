@@ -13,8 +13,6 @@ class AptUpdateScanner
             throw new RuntimeException('APT package manager is not available on this server.');
         }
 
-        $this->updatePackageLists();
-
         $result = Process::timeout((int) config('server-security-update-monitor.command_timeout', 30))
             ->run('apt list --upgradable 2>/dev/null');
 
@@ -65,12 +63,8 @@ class AptUpdateScanner
     /**
      * Refresh APT metadata only. This deliberately never upgrades or installs packages.
      */
-    private function updatePackageLists(): void
+    public function updatePackageLists(): void
     {
-        if (! config('server-security-update-monitor.apt.update_package_lists', true)) {
-            return;
-        }
-
         $command = ['/usr/bin/apt-get', 'update'];
 
         // PHP-FPM/Artisan commonly run as www-data. Permit only this exact command
