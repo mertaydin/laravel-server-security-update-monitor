@@ -17,7 +17,7 @@ return [
     ],
     'dnf' => [
         'enabled' => true,
-        'binaries' => ['/usr/bin/dnf', '/usr/bin/yum', '/bin/dnf', '/bin/yum'],
+        'binaries' => ['/usr/bin/dnf', '/usr/bin/dnf5', '/usr/bin/yum', '/bin/dnf', '/bin/dnf5', '/bin/yum'],
     ],
     'apk' => [
         'enabled' => true,
