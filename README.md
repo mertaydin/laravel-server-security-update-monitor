@@ -5,6 +5,14 @@ A Laravel dashboard for Linux server package updates and security patches. The f
 [![Tests](https://github.com/mertaydin/laravel-server-security-update-monitor/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/mertaydin/laravel-server-security-update-monitor/actions/workflows/tests.yml)
 [![License](https://img.shields.io/github/license/mertaydin/laravel-server-security-update-monitor)](LICENSE)
 
+## Dashboard screenshot
+
+<p align="center">
+  <img src="docs/images/dashboard-preview.svg" alt="Laravel Server Security Update Monitor dashboard preview" width="100%">
+</p>
+
+> Preview uses illustrative package data; the live dashboard displays values collected from your server.
+
 ## Dashboard
 
 The dashboard provides an at-a-glance view of pending updates and a package table with installed version, candidate version, repository suite, update classification and severity status.
@@ -41,20 +49,22 @@ The dashboard supports Turkish, English, Arabic, Spanish, Hindi and Simplified C
 
 ## Access control
 
-The dashboard remains protected by `web` and `auth` middleware. To add an application-specific Gate check, define the following ability in `app/Providers/AppServiceProvider.php`:
+The dashboard uses `web` and `auth` middleware by default. Add an application-specific authorization callback in `app/Providers/AppServiceProvider.php`:
 
 ```php
-use Illuminate\\Support\\Facades\\Gate;
+use Illuminate\\Http\\Request;
+use MertAydin\\ServerSecurityUpdateMonitor\\Facades\\ServerSecurityUpdateMonitor;
 
 public function boot(): void
 {
-    Gate::define('viewServerSecurityUpdateMonitor', fn ($user) => (bool) $user->is_admin);
+    ServerSecurityUpdateMonitor::auth(function (Request $request) {
+        return $request->user()
+            && $request->user()->hasRole('SuperAdmin');
+    });
 }
 ```
 
-The Gate is optional. If it is not registered, the default `web` and `auth` middleware still protect the dashboard.
-
-When this Gate is defined, the package enforces it on dashboard access. Change the ability name with `authorization.gate` in the published configuration. If the Gate is not defined, the default `auth` middleware remains the access control.
+Return `true` to allow access and `false` to respond with HTTP 403. The callback receives the current request; if omitted, the configured `web` and `auth` middleware remain in effect.
 
 ## Scan
 
