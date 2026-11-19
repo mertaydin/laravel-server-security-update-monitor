@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark light">
 <title>{{ __('server-security-update-monitor::messages.title') }}</title>
-<link rel="stylesheet" href="{{ asset('vendor/server-security-update-monitor/css/dashboard.css') }}">
+<link rel="stylesheet" href="{{ asset('vendor/server-security-update-monitor/css/dashboard.css') }}?v=0.1.10">
 <script>
-(function(){try{var t=localStorage.getItem('ssum-theme')||'system';var d=t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.theme=d?'dark':'light';}catch(e){document.documentElement.dataset.theme='dark';}})();
+(function(){var t='system';try{t=localStorage.getItem('ssum-theme')||'system';}catch(e){}var prefersDark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;var d=t==='dark'||(t==='system'&&prefersDark);document.documentElement.dataset.theme=d?'dark':'light';})();
 </script>
 </head>
 <body><main class="wrap">
 <header class="top"><div><div class="eyebrow">SERVER HEALTH / SECURITY</div><h1 class="title">{{ __('server-security-update-monitor::messages.title') }}</h1><div class="sub">{{ $data['host'] ?? 'Server' }} · {{ $data['package_manager'] ?? 'APT' }} · {{ __('server-security-update-monitor::messages.last_checked') }}: {{ !empty($data['checked_at']) ? \Illuminate\Support\Carbon::parse($data['checked_at'])->format('d.m.Y H:i:s') : __('server-security-update-monitor::messages.not_checked') }}</div></div><div class="toolbar">
-<form method="POST" action="{{ route('server-security-update-monitor.language') }}">@csrf<select name="locale" aria-label="{{ __('server-security-update-monitor::messages.language') }}" onchange="this.form.submit()">@foreach (['tr'=>'Türkçe','en'=>'English','ar'=>'العربية','es'=>'Español','hi'=>'हिन्दी','zh_CN'=>'简体中文'] as $code=>$label)<option value="{{ $code }}" @selected($locale===$code)>{{ $label }}</option>@endforeach</select></form>
+<form id="language-form" method="POST" action="{{ route('server-security-update-monitor.language') }}">@csrf<select id="language-select" name="locale" aria-label="{{ __('server-security-update-monitor::messages.language') }}">@foreach (['tr'=>'Türkçe','en'=>'English','ar'=>'العربية','es'=>'Español','hi'=>'हिन्दी','zh_CN'=>'简体中文'] as $code=>$label)<option value="{{ $code }}" @selected($locale===$code)>{{ $label }}</option>@endforeach</select></form>
 <select id="theme-select" aria-label="{{ __('server-security-update-monitor::messages.theme') }}"><option value="system">{{ __('server-security-update-monitor::messages.system') }}</option><option value="light">{{ __('server-security-update-monitor::messages.light') }}</option><option value="dark">{{ __('server-security-update-monitor::messages.dark') }}</option></select>
 <a class="btn" id="refresh-dashboard" href="{{ route('server-security-update-monitor.dashboard', ['refresh' => 1]) }}">↻ {{ __('server-security-update-monitor::messages.refresh') }}</a></div></header>
 <section class="grid">
@@ -30,8 +30,8 @@
 <div class="loading-overlay" id="scan-loading" aria-hidden="true" role="status" aria-live="polite"><div class="loading-dialog"><div class="loading-spinner"></div><h2>{{ __('server-security-update-monitor::messages.scanning') }}</h2><p>{{ __('server-security-update-monitor::messages.scanning_help') }}</p><div class="loading-track"><span></span></div></div></div>
 <script>
 (function(){
-const theme=document.getElementById('theme-select');const saved=localStorage.getItem('ssum-theme')||'system';theme.value=saved;
-theme.addEventListener('change',function(){localStorage.setItem('ssum-theme',this.value);const dark=this.value==='dark'||(this.value==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.theme=dark?'dark':'light';});
+const languageForm=document.getElementById('language-form');const languageSelect=document.getElementById('language-select');if(languageForm&&languageSelect){languageSelect.addEventListener('change',function(){languageForm.submit();});}
+const theme=document.getElementById('theme-select');let saved='system';try{saved=localStorage.getItem('ssum-theme')||'system';}catch(e){}if(theme){theme.value=saved;theme.addEventListener('change',function(){const value=this.value;try{localStorage.setItem('ssum-theme',value);}catch(e){}const prefersDark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;const dark=value==='dark'||(value==='system'&&prefersDark);document.documentElement.dataset.theme=dark?'dark':'light';});}
 const refresh=document.getElementById('refresh-dashboard');const overlay=document.getElementById('scan-loading');if(refresh&&overlay){refresh.addEventListener('click',function(e){e.preventDefault();if(refresh.dataset.loading==='true')return;refresh.dataset.loading='true';refresh.setAttribute('aria-disabled','true');overlay.classList.add('is-visible');overlay.setAttribute('aria-hidden','false');overlay.getBoundingClientRect();const target=refresh.href;window.requestAnimationFrame(function(){window.requestAnimationFrame(function(){window.location.assign(target);});});});}
 })();
 </script>
