@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v0.1.0 - 2026-11-19
 
 - Do not infer High or Normal vulnerability severity from APT repository suites.
 - Display severity as unknown until a trusted advisory is matched to the package and fixed version.
