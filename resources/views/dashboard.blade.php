@@ -15,7 +15,7 @@
 <article class="card blue"><div class="label">{{ __('server-security-update-monitor::messages.pending') }}</div><div class="metric">{{ $data['total_updates'] ?? 0 }}</div></article>
 <article class="card red"><div class="label">{{ __('server-security-update-monitor::messages.security') }}</div><div class="metric">{{ $data['security_updates'] ?? 0 }}</div></article>
 <article class="card amber"><div class="label">{{ __('server-security-update-monitor::messages.normal') }}</div><div class="metric">{{ max(0, ($data['total_updates'] ?? 0) - ($data['security_updates'] ?? 0)) }}</div></article>
-<article class="card green"><div class="label">{{ __('server-security-update-monitor::messages.package_manager') }}</div><div class="metric" style="font-size:25px">APT</div></article>
+<article class="card green"><div class="label">{{ __('server-security-update-monitor::messages.package_manager') }}</div><div class="metric" style="font-size:25px">{{ $data['package_manager'] ?? '—' }}</div></article>
 </section>
 @if(!empty($data['error']))<div class="error"><strong>{{ __('server-security-update-monitor::messages.scan_failed') }}</strong> {{ $data['error'] }}</div>@endif
 <section class="panel"><div class="panel-head"><h2>{{ __('server-security-update-monitor::messages.packages_heading') }}</h2><span class="muted">{{ count($data['packages'] ?? []) }} {{ __('server-security-update-monitor::messages.packages') }}</span></div>
