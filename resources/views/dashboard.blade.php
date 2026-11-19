@@ -4,9 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark light">
 <title>{{ __('server-security-update-monitor::messages.title') }}</title>
 <link rel="stylesheet" href="{{ asset('vendor/server-security-update-monitor/css/dashboard.css') }}?v=0.1.10">
-<script>
-(function(){var t='system';try{t=localStorage.getItem('ssum-theme')||'system';}catch(e){}var prefersDark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;var d=t==='dark'||(t==='system'&&prefersDark);document.documentElement.dataset.theme=d?'dark':'light';})();
-</script>
+<script src="{{ asset('vendor/server-security-update-monitor/js/dashboard.js') }}?v=0.1.11" defer></script>
 </head>
 <body><main class="wrap">
 <header class="top"><div><div class="eyebrow">SERVER HEALTH / SECURITY</div><h1 class="title">{{ __('server-security-update-monitor::messages.title') }}</h1><div class="sub">{{ $data['host'] ?? 'Server' }} · {{ $data['package_manager'] ?? 'APT' }} · {{ __('server-security-update-monitor::messages.last_checked') }}: {{ !empty($data['checked_at']) ? \Illuminate\Support\Carbon::parse($data['checked_at'])->format('d.m.Y H:i:s') : __('server-security-update-monitor::messages.not_checked') }}</div></div><div class="toolbar">
@@ -28,11 +26,5 @@
 <p class="sub" style="margin-top:18px;font-size:12px">{{ __('server-security-update-monitor::messages.disclaimer') }}</p>
 </main>
 <div class="loading-overlay" id="scan-loading" aria-hidden="true" role="status" aria-live="polite"><div class="loading-dialog"><div class="loading-spinner"></div><h2>{{ __('server-security-update-monitor::messages.scanning') }}</h2><p>{{ __('server-security-update-monitor::messages.scanning_help') }}</p><div class="loading-track"><span></span></div></div></div>
-<script>
-(function(){
-const languageForm=document.getElementById('language-form');const languageSelect=document.getElementById('language-select');if(languageForm&&languageSelect){languageSelect.addEventListener('change',function(){languageForm.submit();});}
-const theme=document.getElementById('theme-select');let saved='system';try{saved=localStorage.getItem('ssum-theme')||'system';}catch(e){}if(theme){theme.value=saved;theme.addEventListener('change',function(){const value=this.value;try{localStorage.setItem('ssum-theme',value);}catch(e){}const prefersDark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;const dark=value==='dark'||(value==='system'&&prefersDark);document.documentElement.dataset.theme=dark?'dark':'light';});}
-const refresh=document.getElementById('refresh-dashboard');const overlay=document.getElementById('scan-loading');if(refresh&&overlay){refresh.addEventListener('click',function(e){e.preventDefault();if(refresh.dataset.loading==='true')return;refresh.dataset.loading='true';refresh.setAttribute('aria-disabled','true');overlay.classList.add('is-visible');overlay.setAttribute('aria-hidden','false');overlay.getBoundingClientRect();const target=refresh.href;window.requestAnimationFrame(function(){window.requestAnimationFrame(function(){window.location.assign(target);});});});}
-})();
-</script>
+
 </body></html>
