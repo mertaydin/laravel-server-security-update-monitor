@@ -27,7 +27,7 @@ class DashboardController extends Controller
             } catch (\Throwable $exception) {
                 $data = [
                     'host' => gethostname() ?: 'unknown',
-                    'package_manager' => 'APT',
+                    'package_manager' => 'Unknown',
                     'checked_at' => null,
                     'total_updates' => 0,
                     'security_updates' => 0,
