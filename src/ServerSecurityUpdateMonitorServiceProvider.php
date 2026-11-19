@@ -1,9 +1,9 @@
 <?php
 
-namespace MertAydin\\ServerSecurityUpdateMonitor;
+namespace MertAydin\ServerSecurityUpdateMonitor;
 
-use Illuminate\\Support\\ServiceProvider;
-use MertAydin\\ServerSecurityUpdateMonitor\\Console\\CheckUpdatesCommand;
+use Illuminate\Support\ServiceProvider;
+use MertAydin\ServerSecurityUpdateMonitor\Console\CheckUpdatesCommand;
 
 class ServerSecurityUpdateMonitorServiceProvider extends ServiceProvider
 {
