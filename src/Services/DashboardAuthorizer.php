@@ -16,6 +16,7 @@ class DashboardAuthorizer
 
     public function allows(Request $request): bool
     {
-        return $this->callback === null || (bool) ($this->callback)($request);
+        // Installed package updates and security status are sensitive host data.
+        return $this->callback !== null && (bool) ($this->callback)($request);
     }
 }
