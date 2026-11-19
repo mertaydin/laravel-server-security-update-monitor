@@ -1,3 +1,9 @@
+## [0.1.14] - 2026-11-19
+
+- Stop refreshing APT metadata during the normal Check now scan.
+- Add a separate dashboard action to run `apt-get update` on demand, with progress feedback and result messages.
+- Invalidate cached scan results after a successful metadata refresh.
+
 ## [0.1.13] - 2026-11-19
 
 - Refresh APT package indexes with exactly `apt-get update` before each uncached APT scan.
