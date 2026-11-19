@@ -1,6 +1,6 @@
 # Laravel Server Security Update Monitor
 
-A Laravel dashboard for Linux server package updates and security patches. The first supported package manager is APT on Debian and Ubuntu.
+A Laravel dashboard for Linux server package updates and security patches. It automatically detects APT on Debian/Ubuntu and DNF/YUM on Fedora, RHEL-compatible and Amazon Linux distributions.
 
 [![Tests](https://github.com/mertaydin/laravel-server-security-update-monitor/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/mertaydin/laravel-server-security-update-monitor/actions/workflows/tests.yml)
 [![License](https://img.shields.io/github/license/mertaydin/laravel-server-security-update-monitor)](LICENSE)
@@ -30,7 +30,7 @@ The dashboard provides an at-a-glance view of pending updates and a package tabl
 
 - PHP 8.2+
 - Laravel 10, 11, 12 or 13
-- Debian or Ubuntu with APT and dpkg-query
+- Debian/Ubuntu with APT and dpkg-query, or Fedora/RHEL-compatible/Amazon Linux with DNF/YUM and RPM.
 - The PHP process must be allowed to execute read-only package inspection commands.
 
 ## Installation
@@ -78,7 +78,7 @@ The dashboard also scans when no cached snapshot exists. Use your normal server 
 
 ## Security classification and severity
 
-A package is marked as a security update only when the suite shown by APT matches the configured security suite patterns (by default, `-security` or `/security`). A newer package version alone is not treated as evidence of a vulnerability.
+APT packages are marked as security updates only when their repository suite matches the configured security suite patterns (by default, `-security` or `/security`). DNF/YUM packages are marked as security updates only when they appear in the package manager's available security-advisory list (`updateinfo list --available --security`). If advisory metadata cannot be read, packages are not guessed to be security updates. A newer package version alone is not treated as evidence of a vulnerability.
 
 **Severity is intentionally shown as unknown in this initial release.** APT's upgrade list does not provide reliable CVSS scores or vendor advisory severity. The package will not label every security-pocket update as Critical or High without matching an authoritative advisory to the package and fixed version. CVE/USN/DSA enrichment is planned.
 
@@ -104,11 +104,14 @@ The published `config/server-security-update-monitor.php` file controls:
 | `command_timeout` | `30` | APT command timeout in seconds. |
 | `apt.enabled` | `true` | Enables APT scanning. |
 | `apt.security_suites` | `-security, /security` | Suite patterns considered security repositories. |
+| `dnf.enabled` | `true` | Enables automatic DNF/YUM detection. |
+| `dnf.binaries` | `/usr/bin/dnf`, `/usr/bin/yum`, `/bin/dnf`, `/bin/yum` | DNF/YUM executable candidates. |
+| `apk.enabled` | `true` | Reserved for the planned Alpine APK scanner. |
 
 ## Safety
 
 - Read-only package inspection only.
-- Does not run `apt-get update`, `apt upgrade`, `apt install`, or `dpkg -i`.
+- Does not run `apt-get update`, `apt upgrade`, `apt install`, `dnf upgrade`, `yum update`, `apk upgrade`, or any package installation/removal command.
 - Does not install, remove, or upgrade packages.
 - Does not infer CVSS severity from repository names or version numbers.
 
