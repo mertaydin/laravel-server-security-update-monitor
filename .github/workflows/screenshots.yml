@@ -43,10 +43,10 @@ jobs:
           composer require mertaydin/laravel-server-security-update-monitor:@dev --no-interaction
           cat > app/Providers/AppServiceProvider.php <<'PHP'
           <?php
-          namespace App\\Providers;
-          use Illuminate\\Http\\Request;
-          use Illuminate\\Support\\ServiceProvider;
-          use MertAydin\\ServerSecurityUpdateMonitor\\Facades\\ServerSecurityUpdateMonitor;
+          namespace App\Providers;
+          use Illuminate\Http\Request;
+          use Illuminate\Support\ServiceProvider;
+          use MertAydin\ServerSecurityUpdateMonitor\Facades\ServerSecurityUpdateMonitor;
           class AppServiceProvider extends ServiceProvider {
               public function boot(): void {
                   ServerSecurityUpdateMonitor::auth(static fn (Request $request): bool => true);
