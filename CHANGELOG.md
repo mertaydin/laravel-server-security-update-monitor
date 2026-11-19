@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.1.1 - 2026-11-19
+
+- Add Laravel 13 compatibility for all Illuminate runtime dependencies.
+- Update package development dependencies to support Orchestra Testbench 11 and PHPUnit 13.
+
+
 ## v0.1.0 - 2026-11-19
 
 - Do not infer High or Normal vulnerability severity from APT repository suites.
