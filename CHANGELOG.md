@@ -4,6 +4,7 @@
 
 - Add Laravel 13 compatibility for all Illuminate runtime dependencies.
 - Update package development dependencies to support Orchestra Testbench 11 and PHPUnit 13.
+- Publish the Laravel 13 compatibility fix as v0.1.1.
 
 
 ## v0.1.0 - 2026-11-19
