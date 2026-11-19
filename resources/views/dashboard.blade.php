@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark light">
 <title>{{ __('server-security-update-monitor::messages.title') }}</title>
-<link rel="stylesheet" href="{{ asset('vendor/server-security-update-monitor/css/dashboard.css') }}?v=0.1.14">
+<link rel="stylesheet" href="{{ asset('vendor/server-security-update-monitor/css/dashboard.css') }}?v=0.1.15">
 <script src="{{ asset('vendor/server-security-update-monitor/js/dashboard.js') }}?v=0.1.14" defer></script>
 </head>
 <body><main class="wrap">
@@ -28,6 +28,6 @@
 </tbody></table></div>@endif</section>
 <p class="sub" style="margin-top:18px;font-size:12px">{{ __('server-security-update-monitor::messages.disclaimer') }}</p>
 </main>
-<div class="loading-overlay" id="scan-loading" aria-hidden="true" role="status" aria-live="polite"><div class="loading-dialog"><div class="loading-spinner"></div><h2>{{ __('server-security-update-monitor::messages.scanning') }}</h2><p>{{ __('server-security-update-monitor::messages.scanning_help') }}</p><div class="loading-track"><span></span></div></div></div>
+<div class="loading-overlay" id="scan-loading" aria-hidden="true" data-update-title="{{ __('server-security-update-monitor::messages.updating_package_lists') }}" data-update-help="{{ __('server-security-update-monitor::messages.updating_package_lists_help') }}" role="status" aria-live="polite"><div class="loading-dialog"><div class="loading-spinner"></div><h2>{{ __('server-security-update-monitor::messages.scanning') }}</h2><p>{{ __('server-security-update-monitor::messages.scanning_help') }}</p><div class="loading-track"><span></span></div></div></div>
 
 </body></html>
