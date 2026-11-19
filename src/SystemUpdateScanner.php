@@ -23,7 +23,7 @@ class SystemUpdateScanner
             throw new RuntimeException('APK package manager was detected, but APK scanning is not enabled yet.');
         }
 
-        if (config('server-security-update-monitor.dnf.enabled', true) && $this->isRpmFamily($os) && $this->hasExecutable((array) config('server-security-update-monitor.dnf.binaries', ['/usr/bin/dnf', '/usr/bin/yum', '/bin/dnf', '/bin/yum']))) {
+        if (config('server-security-update-monitor.dnf.enabled', true) && $this->isRpmFamily($os) && $this->hasExecutable((array) config('server-security-update-monitor.dnf.binaries', ['/usr/bin/dnf', '/usr/bin/dnf5', '/usr/bin/yum', '/bin/dnf', '/bin/dnf5', '/bin/yum']))) {
             return $this->dnf->scan();
         }
 
