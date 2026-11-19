@@ -27,4 +27,7 @@ return [
     'disclaimer' => "Security classification is based on APT repository metadata. Severity remains unknown without CVE/USN/DSA matching. Package upgrades are never applied automatically.",
     'scanning' => "Checking server",
     'scanning_help' => "Scanning packages and security updates. Please wait.",
+    'update_package_lists' => "Update package lists",
+    'apt_update_success' => "APT package lists updated. Select Check now to scan with the latest metadata.",
+    'apt_update_failed' => "Unable to update APT package lists:",
 ];
