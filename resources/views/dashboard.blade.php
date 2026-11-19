@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark light">
 <title>{{ __('server-security-update-monitor::messages.title') }}</title>
-<link rel="stylesheet" href="{{ asset('vendor/server-security-update-monitor/css/dashboard.css') }}?v=0.1.11">
-<script src="{{ asset('vendor/server-security-update-monitor/js/dashboard.js') }}?v=0.1.11" defer></script>
+<link rel="stylesheet" href="{{ asset('vendor/server-security-update-monitor/css/dashboard.css') }}?v=0.1.14">
+<script src="{{ asset('vendor/server-security-update-monitor/js/dashboard.js') }}?v=0.1.14" defer></script>
 </head>
 <body><main class="wrap">
 <header class="top"><div><div class="eyebrow">SERVER HEALTH / SECURITY</div><h1 class="title">{{ __('server-security-update-monitor::messages.title') }}</h1><div class="sub">{{ $data['host'] ?? 'Server' }} · {{ $data['package_manager'] ?? 'APT' }} · {{ __('server-security-update-monitor::messages.last_checked') }}: {{ !empty($data['checked_at']) ? \Illuminate\Support\Carbon::parse($data['checked_at'])->format('d.m.Y H:i:s') : __('server-security-update-monitor::messages.not_checked') }}</div></div><div class="toolbar">
