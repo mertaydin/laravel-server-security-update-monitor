@@ -1,3 +1,8 @@
+## v0.2.1 - 2026-11-19
+
+- Add security CI with Composer vulnerability auditing, PHPStan/Larastan analysis, Pint checks, PHP syntax validation, and automated tests.
+- Add weekly Dependabot updates for Composer dependencies and GitHub Actions.
+
 ## v0.1.16 - 2026-11-19
 
 - Add automated browser capture of the live server security dashboard and update the README screenshot.
