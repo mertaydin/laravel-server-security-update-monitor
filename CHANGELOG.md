@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.1.2 - 2026-11-19
+
+- Add a dedicated `server-security-update-monitor-assets` publish tag.
+- Publish the dashboard stylesheet to `public/vendor/server-security-update-monitor` and load it from the published asset path.
+- Document both configuration and asset publishing commands in the README.
+
+
 ## v0.1.1 - 2026-11-19
 
 - Add Laravel 13 compatibility for all Illuminate runtime dependencies.
