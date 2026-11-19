@@ -1,3 +1,8 @@
+## [0.1.15] - 2026-11-19
+
+- Show the centered loading modal and animated progress bar before submitting the separate APT package-list refresh action.
+- Display localized progress text and prevent duplicate refresh submissions.
+
 ## [0.1.14] - 2026-11-19
 
 - Stop refreshing APT metadata during the normal Check now scan.
