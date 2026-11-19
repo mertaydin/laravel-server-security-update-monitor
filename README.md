@@ -19,7 +19,7 @@ The dashboard provides an at-a-glance view of pending updates and a package tabl
 ## Requirements
 
 - PHP 8.2+
-- Laravel 10, 11 or 12
+- Laravel 10, 11, 12 or 13
 - Debian or Ubuntu with APT and dpkg-query
 - The PHP process must be allowed to execute read-only package inspection commands.
 
