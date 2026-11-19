@@ -72,7 +72,7 @@ class DnfUpdateScanner
 
     private function binary(): ?string
     {
-        foreach ((array) config('server-security-update-monitor.dnf.binaries', ['/usr/bin/dnf', '/usr/bin/yum', '/bin/dnf', '/bin/yum']) as $binary) {
+        foreach ((array) config('server-security-update-monitor.dnf.binaries', ['/usr/bin/dnf', '/usr/bin/dnf5', '/usr/bin/yum', '/bin/dnf', '/bin/dnf5', '/bin/yum']) as $binary) {
             if (is_string($binary) && is_executable($binary)) {
                 return $binary;
             }
