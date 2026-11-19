@@ -1,3 +1,7 @@
+## [0.1.7] - 2026-11-19
+
+- Fix the dashboard Blade ParseError caused by an incorrectly escaped Carbon class reference.
+
 ## [0.1.6] - 2026-11-19
 
 - Replace Gate-based dashboard authorization with the `ServerSecurityUpdateMonitor::auth()` callback API.
