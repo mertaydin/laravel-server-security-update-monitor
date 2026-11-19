@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\\Support\\Facades\\Route;
-use MertAydin\\ServerSecurityUpdateMonitor\\Http\\Controllers\\DashboardController;
+use Illuminate\Support\Facades\Route;
+use MertAydin\ServerSecurityUpdateMonitor\Http\Controllers\DashboardController;
 
 Route::middleware(config('server-security-update-monitor.route.middleware', ['web', 'auth']))
     ->prefix(config('server-security-update-monitor.route.prefix', 'server-security-monitor'))
