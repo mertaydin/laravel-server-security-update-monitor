@@ -41,6 +41,20 @@ Panel, bekleyen güncellemeleri ve kurulu sürüm, aday sürüm, depo suite bilg
 - APT ve dpkg-query bulunan Debian/Ubuntu veya DNF/YUM ve RPM bulunan Fedora/RHEL uyumlu/Amazon Linux.
 - PHP süreci paket inceleme komutlarını çalıştırabilmelidir. APT taramaları salt okunurdur ve sunucudaki mevcut yerel paket indekslerini kullanır. APT indekslerini yenilemek ayrı bir panel işlemidir; PHP root olmayan kullanıcıyla çalışıyorsa yalnızca `/usr/bin/apt-get update` için dar kapsamlı parolasız sudo izni verin.
 
+
+> [!CAUTION]
+> **İsteğe bağlı APT paket listesi yenileme izni — sunucu yöneticisinin kabul etmesi gereken güvenlik riski**
+>
+> Paneldeki **Paket Listelerini Güncelle** işlemi `sudo: a password is required` hatası verirse veya `apt-get update` komutunu çalıştıramazsa PHP-FPM sürecinin bu komutu çalıştırma izni olmayabilir. Bu özelliği etkinleştirmek istiyorsanız önce sunucudaki gerçek PHP-FPM kullanıcısını belirleyin. Ardından root olarak `sudo visudo -f /etc/sudoers.d/server-security-update-monitor` komutuyla özel bir sudoers dosyası oluşturun ve yalnızca aşağıdaki kuralı ekleyin (PHP-FPM kullanıcınız farklıysa `www-data` yerine onu yazın):
+>
+> ```sudoers
+> www-data ALL=(root) NOPASSWD: /usr/bin/apt-get update
+> ```
+>
+> Dosyayı `sudo visudo -cf /etc/sudoers.d/server-security-update-monitor` komutuyla doğrulayın ve izinlerinin `0440` olduğundan emin olun (`sudo chmod 0440 /etc/sudoers.d/server-security-update-monitor`). Yetkiyi `sudo -u www-data sudo -n /usr/bin/apt-get update` komutuyla test edin; gerekiyorsa kullanıcı adını değiştirin.
+>
+> **Bu kuralı uygulamadan önce riski anlamalı ve açıkça kabul etmelisiniz.** Kural yalnızca APT paket listesi yenileme komutuyla sınırlandırılmıştır; genel parolasız sudo veya paket kurma/yükseltme/kaldırma yetkisi vermez. Bununla birlikte web uygulamasının PHP-FPM kullanıcısına bu komutu root olarak çalıştırma imkânı tanır. Ele geçirilmiş bir uygulama veya kötüye kullanılan bir panel hesabı, yenileme işlemini tekrar tekrar başlatarak ağ, disk ve işlemci kaynaklarını tüketebilir. Ayrıca APT yapılandırmanızı kontrol edin: sistemde tanımlı yerel APT hook'ları güncelleme sırasında yükseltilmiş yetkilerle çalışabilir. Paneli sıkı yönetici yetkilendirmesiyle koruyun, uygulamayı ve sunucuyu güncel tutun; `NOPASSWD: ALL` veya joker karakterli geniş komut kuralları kullanmayın. Bu riskleri kabul etmiyorsanız **sudoers kuralını eklemeyin**; panel mevcut paket indeksleriyle tarama yapmaya devam edebilir ancak manuel liste yenileme işlemi çalışmaz.
+
 ## Kurulum
 
 ```bash
