@@ -6,6 +6,9 @@ return [
         'prefix' => 'server-security-monitor',
         'middleware' => ['web', 'auth'],
     ],
+    'authorization' => [
+        'gate' => 'viewServerSecurityUpdateMonitor',
+    ],
     'cache' => [
         'key' => 'server-security-update-monitor.packages',
         'seconds' => 900,
