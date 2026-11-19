@@ -41,6 +41,20 @@ The dashboard provides an at-a-glance view of pending updates and a package tabl
 - Debian/Ubuntu with APT and dpkg-query, or Fedora/RHEL-compatible/Amazon Linux with DNF/YUM and RPM.
 - The PHP process must be allowed to execute package inspection commands. APT scans are read-only and use the currently available local package indexes. Refreshing APT indexes is a separate dashboard action; when PHP runs as a non-root user, grant narrowly scoped passwordless sudo permission for `/usr/bin/apt-get update` only.
 
+
+> [!CAUTION]
+> **Optional APT index refresh permission — security risk accepted by the server administrator**
+>
+> When the dashboard's **Update package lists** action reports `sudo: a password is required` or cannot execute `apt-get update`, the PHP-FPM process may not have permission to run this command. If you intentionally want to enable this feature, first identify the actual PHP-FPM user on your server. Then, as root, create a dedicated sudoers file with `sudo visudo -f /etc/sudoers.d/server-security-update-monitor` and add only the following rule (replace `www-data` if your PHP-FPM user is different):
+>
+> ```sudoers
+> www-data ALL=(root) NOPASSWD: /usr/bin/apt-get update
+> ```
+>
+> Validate the file with `sudo visudo -cf /etc/sudoers.d/server-security-update-monitor` and ensure it has mode `0440` (`sudo chmod 0440 /etc/sudoers.d/server-security-update-monitor`). Test the permission using `sudo -u www-data sudo -n /usr/bin/apt-get update`, replacing the user name as needed.
+>
+> **You must understand and explicitly accept this risk before applying the rule.** Although the rule is restricted to the APT index refresh command and does not grant general passwordless sudo or permission to install/upgrade/remove packages, it still allows the web application's PHP-FPM user to execute that command as root. A compromised application or an abused dashboard account could trigger repeated refreshes, causing network, disk and CPU usage. Also review your APT configuration: locally configured APT hooks may run during an update with elevated privileges. Protect the dashboard with strict administrator authorization, keep the application and server patched, and do not use broad rules such as `NOPASSWD: ALL` or wildcard command arguments. If you do not accept these risks, **do not add the sudoers rule**; the dashboard can continue scanning using the package indexes already present on the server, but the manual refresh action will not work.
+
 ## Installation
 
 ```bash
