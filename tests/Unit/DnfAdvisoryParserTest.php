@@ -70,4 +70,46 @@ OUTPUT;
 
         $this->assertSame('unknown', $result['kernel-core']['severity']);
     }
+
+    public function test_it_parses_dnf5_check_upgrade_json_and_ignores_obsoletes(): void
+    {
+        $json = json_encode([
+            'Available Upgrades' => [
+                ['name' => 'openssl-libs', 'arch' => 'x86_64', 'evr' => '1:3.2.2-6.el9_5', 'repository' => 'baseos'],
+                ['name' => 'curl', 'arch' => 'x86_64', 'evr' => '8.5.0-1.el9', 'repository' => 'appstream'],
+            ],
+            'Obsoleting Packages' => [
+                ['name' => 'replacement', 'arch' => 'x86_64', 'evr' => '1.0-1', 'repository' => 'baseos'],
+            ],
+        ], JSON_THROW_ON_ERROR);
+
+        $result = DnfUpdateScanner::parseDnf5UpgradeJson($json);
+
+        $this->assertCount(2, $result);
+        $this->assertSame('openssl-libs', $result[0]['name']);
+        $this->assertSame('1:3.2.2-6.el9_5', $result[0]['version']);
+        $this->assertSame('x86_64', $result[0]['architecture']);
+        $this->assertSame('baseos', $result[0]['repository']);
+    }
+
+    public function test_it_builds_fedora_advisory_links(): void
+    {
+        $json = json_encode([[
+            'name' => 'FEDORA-2026-1234',
+            'type' => 'security',
+            'severity' => 'Important',
+            'nevra' => 'openssl-libs-0:3.2.2-6.fc43.x86_64',
+            'references' => [
+                ['reference_id' => 'CVE-2026-12345'],
+            ],
+        ]], JSON_THROW_ON_ERROR);
+
+        $result = DnfUpdateScanner::parseAdvisoryJson($json);
+
+        $this->assertSame(
+            ['https://bodhi.fedoraproject.org/updates/FEDORA-2026-1234'],
+            $result['openssl-libs']['advisory_urls']
+        );
+    }
+
 }
