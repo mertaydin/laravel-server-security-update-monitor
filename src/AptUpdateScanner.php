@@ -101,7 +101,7 @@ class AptUpdateScanner
         $queries = [];
         $packageIndexes = [];
         foreach ($packages as $index => $package) {
-            if (empty($package['installed_version'])) {
+            if (empty($package['installed_version']) || empty($package['source_package'])) {
                 continue;
             }
 
@@ -117,45 +117,60 @@ class AptUpdateScanner
         }
 
         $timeout = max(1, (int) config('server-security-update-monitor.apt.osv.timeout', 5));
-        $context = stream_context_create([
-            'http' => [
-                'method' => 'POST',
-                'header' => "Content-Type: application/json\r\nAccept: application/json\r\nUser-Agent: Laravel-Server-Security-Update-Monitor\r\n",
-                'content' => json_encode(['queries' => $queries], JSON_THROW_ON_ERROR),
-                'timeout' => $timeout,
-                'ignore_errors' => true,
-            ],
-        ]);
+        $idsByPackage = [];
+        $pending = [];
 
-        $response = @file_get_contents('https://api.osv.dev/v1/querybatch', false, $context);
-        if (! is_string($response)) {
+        // OSV querybatch accepts at most 1,000 queries. Keep each request bounded.
+        foreach (array_chunk($queries, 500, true) as $chunk) {
+            $indexes = array_slice($packageIndexes, array_key_first($chunk), count($chunk));
+            $this->collectOsvIds($chunk, $indexes, $timeout, $idsByPackage);
+        }
+
+        if ($idsByPackage === []) {
             return;
         }
 
-        $decoded = json_decode($response, true);
-        if (! is_array($decoded) || ! is_array($decoded['results'] ?? null)) {
-            return;
+        // querybatch intentionally returns only vulnerability IDs and modified timestamps.
+        // Fetch each unique record once to obtain affected ranges, aliases, severity and references.
+        $details = [];
+        $allIds = array_values(array_unique(array_merge(...array_values($idsByPackage))));
+        foreach ($allIds as $id) {
+            $detail = $this->fetchOsvVulnerability($id, $timeout);
+            if ($detail !== null) {
+                $details[$id] = $detail;
+            }
         }
 
-        foreach ($packageIndexes as $queryIndex => $packageIndex) {
-            $vulnerabilities = $decoded['results'][$queryIndex]['vulns'] ?? [];
-            foreach (is_array($vulnerabilities) ? $vulnerabilities : [] as $vulnerability) {
+        foreach ($idsByPackage as $packageIndex => $ids) {
+            foreach ($ids as $id) {
+                $vulnerability = $details[$id] ?? null;
                 if (! is_array($vulnerability)) {
                     continue;
                 }
 
-                $id = (string) ($vulnerability['id'] ?? '');
-                $aliases = array_values(array_filter((array) ($vulnerability['aliases'] ?? []), fn ($alias) => preg_match('/^CVE-\d{4}-\d{4,}$/i', (string) $alias) === 1));
-                $cves = array_values(array_unique(array_merge(
-                    preg_match('/^CVE-\d{4}-\d{4,}$/i', $id) ? [strtoupper($id)] : [],
-                    array_map('strtoupper', $aliases)
-                )));
-
-                if (! $this->candidateFixesVulnerability($packages[$packageIndex]['candidate_version'], $vulnerability)) {
+                $package = $packages[$packageIndex];
+                if (! $this->candidateFixesVulnerability(
+                    $package['source_package'],
+                    $ecosystem,
+                    $package['candidate_version'],
+                    $vulnerability
+                )) {
                     continue;
                 }
 
-                $priority = 'unknown';
+                $vulnerabilityId = (string) ($vulnerability['id'] ?? $id);
+                $aliases = array_values(array_filter((array) ($vulnerability['aliases'] ?? []), fn ($alias) => preg_match('/^CVE-\d{4}-\d{4,}$/i', (string) $alias) === 1));
+                $cves = array_values(array_unique(array_merge(
+                    preg_match('/^CVE-\d{4}-\d{4,}$/i', $vulnerabilityId) ? [strtoupper($vulnerabilityId)] : [],
+                    array_map('strtoupper', $aliases)
+                )));
+
+                $priority = $this->normalizeSeverity((string) (
+                    $vulnerability['database_specific']['severity']
+                    ?? $vulnerability['database_specific']['ubuntu_priority']
+                    ?? ''
+                ));
+
                 foreach ((array) ($vulnerability['severity'] ?? []) as $severity) {
                     if (is_array($severity) && strtoupper((string) ($severity['type'] ?? '')) === 'UBUNTU') {
                         $priority = $this->normalizeSeverity((string) ($severity['score'] ?? ''));
@@ -175,44 +190,126 @@ class AptUpdateScanner
                 $packages[$packageIndex]['advisory_source'] = 'OSV';
                 $packages[$packageIndex]['advisory_ids'] = array_values(array_unique(array_merge(
                     $packages[$packageIndex]['advisory_ids'],
-                    $id !== '' ? [$id] : []
+                    $vulnerabilityId !== '' ? [$vulnerabilityId] : []
                 )));
                 $packages[$packageIndex]['cves'] = array_values(array_unique(array_merge($packages[$packageIndex]['cves'], $cves)));
                 $packages[$packageIndex]['advisory_urls'] = array_values(array_unique(array_merge($packages[$packageIndex]['advisory_urls'], $references)));
 
                 if ($priority !== 'unknown') {
                     $packages[$packageIndex]['severity'] = $priority;
-                    $packages[$packageIndex]['severity_label'] = ucfirst($priority).' (Ubuntu)';
+                    $packages[$packageIndex]['severity_label'] = ucfirst($priority);
                 }
             }
         }
     }
 
-    private function candidateFixesVulnerability(string $candidateVersion, array $vulnerability): bool
+    /**
+     * Collect OSV vulnerability IDs, following per-query pagination tokens.
+     *
+     * @param  array<int, array<string, mixed>>  $queries
+     * @param  array<int, int>  $packageIndexes
+     * @param  array<int, array<int, string>>  $idsByPackage
+     */
+    private function collectOsvIds(array $queries, array $packageIndexes, int $timeout, array &$idsByPackage): void
     {
-        $fixedVersions = [];
+        $pending = [];
+        foreach ($queries as $offset => $query) {
+            $pending[] = ['query' => $query, 'index' => $packageIndexes[$offset]];
+        }
 
-        foreach ((array) ($vulnerability['affected'] ?? []) as $affected) {
-            foreach ((array) ($affected['ranges'] ?? []) as $range) {
-                foreach ((array) ($range['events'] ?? []) as $event) {
-                    if (isset($event['fixed']) && is_string($event['fixed']) && $event['fixed'] !== '') {
-                        $fixedVersions[] = $event['fixed'];
+        while ($pending !== []) {
+            $batch = array_splice($pending, 0, 500);
+            $payload = ['queries' => array_map(
+                static fn ($item) => $item['query'] + (isset($item['page_token']) ? ['page_token' => $item['page_token']] : []),
+                $batch
+            )];
+            $context = stream_context_create([
+                'http' => [
+                    'method' => 'POST',
+                    'header' => "Content-Type: application/json\r\nAccept: application/json\r\nUser-Agent: Laravel-Server-Security-Update-Monitor\r\n",
+                    'content' => json_encode($payload, JSON_THROW_ON_ERROR),
+                    'timeout' => $timeout,
+                    'ignore_errors' => true,
+                ],
+            ]);
+            $response = @file_get_contents('https://api.osv.dev/v1/querybatch', false, $context);
+            if (! is_string($response)) {
+                continue;
+            }
+
+            $decoded = json_decode($response, true);
+            if (! is_array($decoded) || ! is_array($decoded['results'] ?? null)) {
+                continue;
+            }
+
+            foreach ($batch as $offset => $item) {
+                $result = $decoded['results'][$offset] ?? [];
+                foreach ((array) ($result['vulns'] ?? []) as $vulnerability) {
+                    if (is_array($vulnerability) && ! empty($vulnerability['id'])) {
+                        $idsByPackage[$item['index']][] = (string) $vulnerability['id'];
                     }
+                }
+
+                if (! empty($result['next_page_token'])) {
+                    $pending[] = [
+                        'query' => $item['query'],
+                        'index' => $item['index'],
+                        'page_token' => (string) $result['next_page_token'],
+                    ];
                 }
             }
         }
 
-        if ($fixedVersions === []) {
-            return false;
+        foreach ($idsByPackage as $index => $ids) {
+            $idsByPackage[$index] = array_values(array_unique($ids));
+        }
+    }
+
+    private function fetchOsvVulnerability(string $id, int $timeout): ?array
+    {
+        if (! preg_match('/^[A-Za-z0-9._:-]+$/', $id)) {
+            return null;
         }
 
-        foreach (array_unique($fixedVersions) as $fixedVersion) {
-            $comparison = Process::timeout(5)->run([
-                '/usr/bin/dpkg', '--compare-versions', $candidateVersion, 'ge', $fixedVersion,
-            ]);
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'GET',
+                'header' => "Accept: application/json\r\nUser-Agent: Laravel-Server-Security-Update-Monitor\r\n",
+                'timeout' => $timeout,
+                'ignore_errors' => true,
+            ],
+        ]);
+        $response = @file_get_contents('https://api.osv.dev/v1/vulns/'.rawurlencode($id), false, $context);
+        if (! is_string($response)) {
+            return null;
+        }
 
-            if ($comparison->successful()) {
-                return true;
+        $decoded = json_decode($response, true);
+
+        return is_array($decoded) ? $decoded : null;
+    }
+
+    private function candidateFixesVulnerability(string $packageName, string $ecosystem, string $candidateVersion, array $vulnerability): bool
+    {
+        foreach ((array) ($vulnerability['affected'] ?? []) as $affected) {
+            $affectedPackage = $affected['package'] ?? [];
+            if (($affectedPackage['name'] ?? null) !== $packageName || ($affectedPackage['ecosystem'] ?? null) !== $ecosystem) {
+                continue;
+            }
+
+            foreach ((array) ($affected['ranges'] ?? []) as $range) {
+                foreach ((array) ($range['events'] ?? []) as $event) {
+                    if (! isset($event['fixed']) || ! is_string($event['fixed']) || $event['fixed'] === '') {
+                        continue;
+                    }
+
+                    $comparison = Process::timeout(5)->run([
+                        '/usr/bin/dpkg', '--compare-versions', $candidateVersion, 'ge', $event['fixed'],
+                    ]);
+                    if ($comparison->successful()) {
+                        return true;
+                    }
+                }
             }
         }
 
@@ -223,9 +320,9 @@ class AptUpdateScanner
     {
         return match (strtolower(trim($severity))) {
             'critical' => 'critical',
-            'high' => 'high',
-            'medium' => 'medium',
-            'low' => 'low',
+            'important', 'high' => 'high',
+            'moderate', 'medium' => 'medium',
+            'low', 'unimportant' => 'low',
             default => 'unknown',
         };
     }
