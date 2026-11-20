@@ -70,12 +70,17 @@ jobs:
                   exit 1
                 fi
               else
+                . /etc/os-release
                 set +e
-                runuser -u scanner -- dnf -q --cacheonly check-upgrade --json >/tmp/dnf-check-upgrade.json 2>&1
+                if [ "$ID" = rocky ]; then
+                  runuser -u scanner -- dnf -q --cacheonly check-update >/tmp/dnf-check-update.txt 2>&1
+                else
+                  runuser -u scanner -- dnf -q --cacheonly check-upgrade --json >/tmp/dnf-check-upgrade.json 2>&1
+                fi
                 status=$?
                 set -e
                 if [ "$status" -ne 0 ] && [ "$status" -ne 100 ]; then
-                  cat /tmp/dnf-check-upgrade.json
+                  cat /tmp/dnf-check-update.txt /tmp/dnf-check-upgrade.json 2>/dev/null || true
                   exit "$status"
                 fi
               fi
