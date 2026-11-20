@@ -1,3 +1,11 @@
+## Unreleased
+
+- Run DNF5, DNF4 and YUM update/advisory queries with `--cacheonly`, allowing read-only scans under an unprivileged PHP-FPM account without refreshing package metadata.
+- Expand native integration tests to run as a dedicated unprivileged user on Ubuntu 24.04, Debian 12, Fedora DNF5 and Rocky Linux 9 DNF4.
+- Validate the exact APT sudoers boundary: allow only `/usr/bin/apt-get update`, verify the command with `visudo`, and assert that `apt-get upgrade` remains denied.
+- Verify dpkg source-package metadata fields and the documented DNF5 extended advisory JSON schema.
+- Document that DNF/YUM repository metadata must be refreshed separately by a privileged maintenance task.
+
 ## v0.2.6 - 2026-11-21
 
 - Resolve OSV querybatch IDs to full vulnerability records, follow pagination and fetch each unique record once.
