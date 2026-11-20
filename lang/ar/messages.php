@@ -32,4 +32,16 @@ return [
     'apt_update_failed' => "تعذر تحديث قوائم APT:",
     'updating_package_lists' => "جارٍ تحديث قوائم حزم APT",
     'updating_package_lists_help' => "جارٍ تحديث بيانات المستودعات. يرجى الانتظار حتى اكتمال العملية."
+    'advisories' => "إشعارات الأمان",
+    'cves' => "سجلات CVE",
+    'search_packages' => "ابحث عن حزمة أو CVE أو إشعار...",
+    'filter_updates' => "نوع التحديث",
+    'filter_all' => "كل التحديثات",
+    'filter_security' => "الأمان فقط",
+    'filter_normal' => "العادية فقط",
+    'filter_severity' => "مستوى الخطورة",
+    'filter_severity_all' => "كل مستويات الخطورة",
+    'unknown' => "غير معروف",
+    'no_filter_results' => "لا توجد حزم تطابق عوامل التصفية.",
+    'disclaimer' => "يعتمد التصنيف على بيانات مستودع APT وسجلات OSV المطابقة أو إشعارات موردي DNF/YUM. لا تعرض الخطورة إلا إذا وفرتها بيانات المصدر. لا يتم ترقية الحزم تلقائياً.",
 ];
