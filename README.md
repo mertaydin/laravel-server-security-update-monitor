@@ -109,7 +109,8 @@ APT security metadata is enriched on a best-effort basis with OSV records. The i
 | Package manager | Status |
 | --- | --- |
 | APT (Debian/Ubuntu) | Initial support |
-| DNF5 | Supported (JSON update and advisory metadata) |\n| DNF4/YUM | Supported (text updateinfo metadata) |
+| DNF5 | Supported (JSON update and advisory metadata) |
+| DNF4/YUM | Supported (text updateinfo metadata) |
 | APK | Planned |
 
 ## Configuration
@@ -126,7 +127,9 @@ The published `config/server-security-update-monitor.php` file controls:
 | `command_timeout` | `30` | APT command timeout in seconds. |
 | `apt.enabled` | `true` | Enables APT scanning. |
 | `apt.update_timeout` | `300` | Maximum time in seconds allowed for the manual dashboard `apt-get update` action. |
-| `apt.security_suites` | `-security, /security` | Suite patterns considered security repositories. |\n| `apt.osv.enabled` | `true` | Enables best-effort Ubuntu/Debian OSV advisory enrichment. |\n| `apt.osv.timeout` | `5` | OSV HTTP request timeout in seconds. |
+| `apt.security_suites` | `-security, /security` | Suite patterns considered security repositories. |
+| `apt.osv.enabled` | `true` | Enables best-effort Ubuntu/Debian OSV advisory enrichment. |
+| `apt.osv.timeout` | `5` | OSV HTTP request timeout in seconds. |
 | `dnf.enabled` | `true` | Enables automatic DNF/YUM detection. |
 | `dnf.binaries` | `/usr/bin/dnf`, `/usr/bin/dnf5`, `/usr/bin/yum`, `/bin/dnf`, `/bin/dnf5`, `/bin/yum` | DNF/YUM executable candidates. |
 | `apk.enabled` | `true` | Reserved for the planned Alpine APK scanner. |
