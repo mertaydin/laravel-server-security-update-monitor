@@ -318,29 +318,63 @@ class AptUpdateScanner
 
     private function candidateFixesVulnerability(string $packageName, string $ecosystem, string $candidateVersion, array $vulnerability): bool
     {
+        $matchedPackage = false;
+        $candidateResolved = false;
+
         foreach ((array) ($vulnerability['affected'] ?? []) as $affected) {
             $affectedPackage = $affected['package'] ?? [];
             if (($affectedPackage['name'] ?? null) !== $packageName || ($affectedPackage['ecosystem'] ?? null) !== $ecosystem) {
                 continue;
             }
 
-            foreach ((array) ($affected['ranges'] ?? []) as $range) {
-                foreach ((array) ($range['events'] ?? []) as $event) {
-                    if (! isset($event['fixed']) || ! is_string($event['fixed']) || $event['fixed'] === '') {
-                        continue;
-                    }
+            $matchedPackage = true;
 
-                    $comparison = Process::timeout(5)->run([
-                        '/usr/bin/dpkg', '--compare-versions', $candidateVersion, 'ge', $event['fixed'],
-                    ]);
-                    if ($comparison->successful()) {
-                        return true;
+            if (in_array($candidateVersion, (array) ($affected['versions'] ?? []), true)) {
+                return false;
+            }
+
+            foreach ((array) ($affected['ranges'] ?? []) as $range) {
+                if (strtoupper((string) ($range['type'] ?? '')) !== 'ECOSYSTEM') {
+                    continue;
+                }
+
+                $rangeAffected = false;
+                $rangeResolved = false;
+
+                foreach ((array) ($range['events'] ?? []) as $event) {
+                    if (isset($event['introduced']) && is_string($event['introduced'])) {
+                        $rangeAffected = $this->dpkgVersionCompare($candidateVersion, 'ge', $event['introduced']);
+                    } elseif (isset($event['fixed']) && is_string($event['fixed'])) {
+                        if ($this->dpkgVersionCompare($candidateVersion, 'ge', $event['fixed'])) {
+                            $rangeAffected = false;
+                            $rangeResolved = true;
+                        }
+                    } elseif (isset($event['last_affected']) && is_string($event['last_affected'])) {
+                        if ($this->dpkgVersionCompare($candidateVersion, 'gt', $event['last_affected'])) {
+                            $rangeAffected = false;
+                            $rangeResolved = true;
+                        }
                     }
                 }
+
+                if ($rangeAffected) {
+                    return false;
+                }
+
+                $candidateResolved = $candidateResolved || $rangeResolved;
             }
         }
 
-        return false;
+        return $matchedPackage && $candidateResolved;
+    }
+
+    private function dpkgVersionCompare(string $left, string $operator, string $right): bool
+    {
+        $comparison = Process::timeout(5)->run([
+            '/usr/bin/dpkg', '--compare-versions', $left, $operator, $right,
+        ]);
+
+        return $comparison->successful();
     }
 
     private function normalizeSeverity(string $severity): string
