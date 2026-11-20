@@ -22,6 +22,7 @@ class PackageManagerSmokeTest extends TestCase
 
         if (is_executable('/usr/bin/apt-get')) {
             if (getenv('RUN_PRIVILEGE_INTEGRATION') === '1') {
+                $this->assertTrue(function_exists('posix_geteuid'), 'The POSIX extension is required for the privilege integration test.');
                 $this->assertNotSame(0, posix_geteuid(), 'Privilege integration must run as an unprivileged user.');
                 (new AptUpdateScanner)->updatePackageLists();
             }
