@@ -31,7 +31,7 @@ return [
     'apt_update_success' => "تم تحديث قوائم APT. اختر الفحص الآن للتحقق باستخدام البيانات الحديثة.",
     'apt_update_failed' => "تعذر تحديث قوائم APT:",
     'updating_package_lists' => "جارٍ تحديث قوائم حزم APT",
-    'updating_package_lists_help' => "جارٍ تحديث بيانات المستودعات. يرجى الانتظار حتى اكتمال العملية."
+    'updating_package_lists_help' => "جارٍ تحديث بيانات المستودعات. يرجى الانتظار حتى اكتمال العملية.",
     'advisories' => "إشعارات الأمان",
     'cves' => "سجلات CVE",
     'search_packages' => "ابحث عن حزمة أو CVE أو إشعار...",
