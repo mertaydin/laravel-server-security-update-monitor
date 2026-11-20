@@ -34,17 +34,55 @@ class DnfUpdateScanner
         }
 
         $timeout = (int) config('server-security-update-monitor.command_timeout', 30);
-        $result = Process::timeout($timeout)->run([$binary, '-q', 'check-update']);
+        $jsonResult = Process::timeout($timeout)->run([$binary, '-q', 'check-upgrade', '--json']);
+        $jsonPackages = null;
 
-        // DNF/YUM return 100 when updates are available.
-        if (! in_array($result->exitCode(), [0, 100], true)) {
-            throw new RuntimeException('Unable to read DNF/YUM update list: '.trim($result->errorOutput().' '.$result->output()));
+        // DNF5 exposes a documented machine-readable check-upgrade format.
+        if (in_array($jsonResult->exitCode(), [0, 100], true)) {
+            $decoded = json_decode($jsonResult->output(), true);
+            if (is_array($decoded)) {
+                $jsonPackages = self::parseDnf5UpgradeJson($jsonResult->output());
+            }
+        }
+
+        if ($jsonPackages === null) {
+            $result = Process::timeout($timeout)->run([$binary, '-q', 'check-update']);
+
+            // DNF4/YUM return 100 when updates are available.
+            if (! in_array($result->exitCode(), [0, 100], true)) {
+                throw new RuntimeException('Unable to read DNF/YUM update list: '.trim($result->errorOutput().' '.$result->output()));
+            }
+            $lines = preg_split('/\r?\n/', $result->output());
         }
 
         $advisories = $this->advisories($binary, $timeout);
         $packages = [];
 
-        foreach (preg_split('/\r?\n/', $result->output()) as $line) {
+        if ($jsonPackages !== null) {
+            foreach ($jsonPackages as $row) {
+                $name = $row['name'];
+                $advisory = $advisories[$name] ?? [];
+                $installed = Process::timeout(10)->run([
+                    'rpm', '-q', '--qf', '%{VERSION}-%{RELEASE}.%{ARCH}', '--', $name,
+                ]);
+                $packages[] = [
+                    'name' => $name,
+                    'installed_version' => $installed->successful() ? trim($installed->output()) : null,
+                    'candidate_version' => $row['version'],
+                    'architecture' => $row['architecture'],
+                    'repository' => $row['repository'],
+                    'is_security' => ! empty($advisory),
+                    'severity' => $advisory['severity'] ?? 'unknown',
+                    'severity_label' => $advisory['severity_label'] ?? 'Unknown',
+                    'type' => ! empty($advisory) ? 'Security update' : 'Package update',
+                    'advisory_ids' => $advisory['advisory_ids'] ?? [],
+                    'cves' => $advisory['cves'] ?? [],
+                    'advisory_urls' => $advisory['advisory_urls'] ?? [],
+                    'advisory_source' => ! empty($advisory) ? 'DNF/YUM updateinfo' : null,
+                ];
+            }
+        } else {
+            foreach ($lines as $line) {
             $line = trim($line);
 
             if ($line === '' || str_starts_with($line, 'Last metadata expiration check')
@@ -77,6 +115,7 @@ class DnfUpdateScanner
                 'advisory_urls' => $advisory['advisory_urls'] ?? [],
                 'advisory_source' => ! empty($advisory) ? 'DNF/YUM updateinfo' : null,
             ];
+            }
         }
 
         usort($packages, fn ($a, $b) => [$b['is_security'], $a['name']] <=> [$a['is_security'], $b['name']]);
@@ -89,6 +128,49 @@ class DnfUpdateScanner
             'security_updates' => count(array_filter($packages, fn ($package) => $package['is_security'])),
             'packages' => $packages,
         ];
+    }
+
+    /**
+     * Parse DNF5's documented check-upgrade --json output.
+     *
+     * @return array<int, array{name: string, version: string, architecture: string, repository: string}>
+     */
+    public static function parseDnf5UpgradeJson(string $json): array
+    {
+        $sections = json_decode($json, true);
+        if (! is_array($sections)) {
+            return [];
+        }
+
+        $packages = [];
+        foreach ($sections as $section => $rows) {
+            if (str_contains(strtolower((string) $section), 'obsolet') || ! is_array($rows)) {
+                continue;
+            }
+
+            foreach ($rows as $row) {
+                if (! is_array($row)) {
+                    continue;
+                }
+
+                $name = (string) ($row['name'] ?? '');
+                $version = (string) ($row['evr'] ?? '');
+                $architecture = (string) ($row['arch'] ?? '');
+                $repository = (string) ($row['repository'] ?? '');
+                if ($name === '' || $version === '' || $architecture === '') {
+                    continue;
+                }
+
+                $packages[] = [
+                    'name' => $name,
+                    'version' => $version,
+                    'architecture' => $architecture,
+                    'repository' => $repository,
+                ];
+            }
+        }
+
+        return $packages;
     }
 
     /**
@@ -186,7 +268,7 @@ class DnfUpdateScanner
     private function advisories(string $binary, int $timeout): array
     {
         // DNF5 documents this JSON output, including advisory ID, severity, NEVRA and CVE references.
-        $json = Process::timeout($timeout)->run([$binary, '-q', 'advisory', 'list', '--json', '--security']);
+        $json = Process::timeout($timeout)->run([$binary, '-q', 'advisory', 'list', '--json', '--security', '--with-cve']);
         if ($json->successful()) {
             $parsed = self::parseAdvisoryJson($json->output());
             if ($parsed !== []) {
