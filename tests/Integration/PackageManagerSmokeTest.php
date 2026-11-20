@@ -21,6 +21,11 @@ class PackageManagerSmokeTest extends TestCase
         config()->set('server-security-update-monitor.apt.osv.enabled', false);
 
         if (is_executable('/usr/bin/apt-get')) {
+            if (getenv('RUN_PRIVILEGE_INTEGRATION') === '1') {
+                $this->assertNotSame(0, posix_geteuid(), 'Privilege integration must run as an unprivileged user.');
+                (new AptUpdateScanner)->updatePackageLists();
+            }
+
             $metadata = Process::run([
                 '/usr/bin/dpkg-query',
                 '-W',
