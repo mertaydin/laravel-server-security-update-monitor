@@ -31,4 +31,14 @@ class AptOsvEcosystemTest extends TestCase
         $this->assertSame('low', $method->invoke(new AptUpdateScanner(), 'negligible'));
     }
 
+
+    public function test_debian_osv_ecosystem_is_scoped_to_the_major_release(): void
+    {
+        $method = new \ReflectionMethod(AptUpdateScanner::class, 'debianOsvEcosystem');
+
+        $this->assertSame('Debian:12', $method->invoke(new AptUpdateScanner(), '12'));
+        $this->assertSame('Debian:13', $method->invoke(new AptUpdateScanner(), '13.1'));
+        $this->assertNull($method->invoke(new AptUpdateScanner(), 'sid'));
+    }
+
 }
