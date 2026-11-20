@@ -23,4 +23,12 @@ class AptOsvEcosystemTest extends TestCase
         $this->assertSame('Ubuntu:25.04', $method->invoke(new AptUpdateScanner(), '25.04'));
         $this->assertNull($method->invoke(new AptUpdateScanner(), '24'));
     }
+
+    public function test_ubuntu_negligible_priority_is_retained_as_the_lowest_filter_bucket(): void
+    {
+        $method = new \ReflectionMethod(AptUpdateScanner::class, 'normalizeSeverity');
+
+        $this->assertSame('low', $method->invoke(new AptUpdateScanner(), 'negligible'));
+    }
+
 }
