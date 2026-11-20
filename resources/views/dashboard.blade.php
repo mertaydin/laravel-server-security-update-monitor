@@ -34,7 +34,7 @@
 <td class="pkg">{{ $package['name'] }}</td><td class="muted">{{ $package['installed_version'] ?? '—' }}</td><td>{{ $package['candidate_version'] }}</td><td class="muted">{{ $package['repository'] }}</td>
 <td><span class="pill {{ !empty($package['is_security']) ? 'security' : 'normal' }}">{{ $package['type'] }}</span></td>
 <td><span class="pill severity-{{ $package['severity'] ?? 'unknown' }}">{{ $package['severity_label'] ?? __('server-security-update-monitor::messages.unknown') }}</span></td>
-<td>@forelse(($package['advisory_ids'] ?? []) as $index=>$advisory)<a class="reference-link" href="{{ $package['advisory_urls'][$index] ?? '#' }}" target="_blank" rel="noopener noreferrer">{{ $advisory }}</a>@empty<span class="muted">—</span>@endforelse</td>
+<td>@forelse(($package['advisory_ids'] ?? []) as $index=>$advisory)@if(!empty($package['advisory_urls'][$index] ?? null))<a class="reference-link" href="{{ $package['advisory_urls'][$index] }}" target="_blank" rel="noopener noreferrer">{{ $advisory }}</a>@else<span>{{ $advisory }}</span>@endif @empty<span class="muted">—</span>@endforelse</td>
 <td>@forelse(($package['cves'] ?? []) as $cve)<a class="reference-link" href="https://nvd.nist.gov/vuln/detail/{{ rawurlencode($cve) }}" target="_blank" rel="noopener noreferrer">{{ $cve }}</a>@empty<span class="muted">—</span>@endforelse</td>
 </tr>
 @endforeach
