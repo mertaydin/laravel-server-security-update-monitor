@@ -36,6 +36,7 @@ class AptOsvVersionMatchingTest extends TestCase
         $method = new \ReflectionMethod(AptUpdateScanner::class, 'candidateFixesVulnerability');
         $scanner = new AptUpdateScanner;
 
+        $this->assertFalse($method->invoke($scanner, 'openssl', 'Ubuntu:24.04:LTS', '1.0', $vulnerability));
         $this->assertTrue($method->invoke($scanner, 'openssl', 'Ubuntu:24.04:LTS', '1.7', $vulnerability));
         $this->assertFalse($method->invoke($scanner, 'openssl', 'Ubuntu:24.04:LTS', '2.1', $vulnerability));
         $this->assertTrue($method->invoke($scanner, 'openssl', 'Ubuntu:24.04:LTS', '2.6', $vulnerability));
