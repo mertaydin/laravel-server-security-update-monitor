@@ -34,7 +34,10 @@ class PackageManagerSmokeTest extends TestCase
                 'bash',
             ]);
             $this->assertTrue($metadata->successful());
-            $this->assertGreaterThanOrEqual(2, count(explode("\t", trim($metadata->output()))));
+            $metadataFields = explode("\t", trim($metadata->output()));
+            $this->assertCount(3, $metadataFields, 'dpkg-query must return version, source package and source version as separate fields.');
+            $this->assertNotSame('', $metadataFields[1]);
+            $this->assertNotSame('', $metadataFields[2]);
 
             $snapshot = (new AptUpdateScanner)->scan();
             $this->assertSame('APT', $snapshot['package_manager']);
