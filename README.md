@@ -96,7 +96,7 @@ Run a scan manually:
 php artisan server-security-monitor:check
 ```
 
-The **Check now** action scans using the package indexes already present on the server and does not run `apt-get update`. On APT systems, use the separate **Update package lists** dashboard button when you want to refresh repository metadata. The refresh completes independently; select **Check now** afterward to scan using the new metadata.
+The **Check now** action is read-only. APT scans use the package indexes already present and do not run `apt-get update`; DNF/YUM scans use `--cacheonly` and do not refresh repository metadata. On APT systems, use the separate **Update package lists** dashboard button when you want to refresh repository metadata. On DNF/YUM systems, refresh metadata through your normal privileged maintenance process (for example, `dnf makecache` from a root-owned system timer) before scanning. The monitor itself never needs root access for DNF/YUM metadata refresh.
 
 ## Security classification and severity
 
