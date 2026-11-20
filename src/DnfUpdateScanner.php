@@ -7,6 +7,24 @@ use RuntimeException;
 
 class DnfUpdateScanner
 {
+    private function binary(): ?string
+    {
+        if (PHP_OS_FAMILY !== 'Linux') {
+            return null;
+        }
+
+        foreach ((array) config('server-security-update-monitor.dnf.binaries', [
+            '/usr/bin/dnf', '/usr/bin/dnf5', '/usr/bin/yum',
+            '/bin/dnf', '/bin/dnf5', '/bin/yum',
+        ]) as $binary) {
+            if (is_string($binary) && $binary !== '' && is_executable($binary)) {
+                return $binary;
+            }
+        }
+
+        return null;
+    }
+
     public function scan(): array
     {
         $binary = $this->binary();
