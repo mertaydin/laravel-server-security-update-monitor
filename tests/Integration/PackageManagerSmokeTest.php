@@ -5,6 +5,7 @@ namespace MertAydin\ServerSecurityUpdateMonitor\Tests\Integration;
 use MertAydin\ServerSecurityUpdateMonitor\AptUpdateScanner;
 use MertAydin\ServerSecurityUpdateMonitor\DnfUpdateScanner;
 use MertAydin\ServerSecurityUpdateMonitor\ServerSecurityUpdateMonitorServiceProvider;
+use Illuminate\Support\Facades\Process;
 use Orchestra\Testbench\TestCase;
 
 class PackageManagerSmokeTest extends TestCase
@@ -20,6 +21,16 @@ class PackageManagerSmokeTest extends TestCase
         config()->set('server-security-update-monitor.apt.osv.enabled', false);
 
         if (is_executable('/usr/bin/apt-get')) {
+            $metadata = Process::run([
+                '/usr/bin/dpkg-query',
+                '-W',
+                '-f=${Version}\\t${source:Package}\\t${source:Version}',
+                '--',
+                'bash',
+            ]);
+            $this->assertTrue($metadata->successful());
+            $this->assertGreaterThanOrEqual(2, count(explode("\t", trim($metadata->output()))));
+
             $snapshot = (new AptUpdateScanner())->scan();
             $this->assertSame('APT', $snapshot['package_manager']);
         } elseif (is_executable('/usr/bin/dnf') || is_executable('/usr/bin/dnf5') || is_executable('/usr/bin/yum')) {
