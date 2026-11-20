@@ -100,16 +100,16 @@ The **Check now** action scans using the package indexes already present on the 
 
 ## Security classification and severity
 
-APT packages are marked as security updates only when their repository suite matches the configured security suite patterns (by default, `-security` or `/security`). DNF/YUM packages are marked as security updates only when they appear in the package manager's available security-advisory list (`updateinfo list --available --security`). If advisory metadata cannot be read, packages are not guessed to be security updates. A newer package version alone is not treated as evidence of a vulnerability.
+APT packages are marked as security updates only when their repository suite matches the configured security suite patterns (by default, `-security` or `/security`). DNF/YUM packages are marked as security updates only when they are associated with an available vendor security advisory. DNF5 uses its JSON advisory interface with CVE references; DNF4/YUM use `updateinfo info --available --security`. If advisory metadata cannot be read, packages are not guessed to be security updates. A newer package version alone is not treated as evidence of a vulnerability.
 
-**Severity is intentionally shown as unknown in this initial release.** APT's upgrade list does not provide reliable CVSS scores or vendor advisory severity. The package will not label every security-pocket update as Critical or High without matching an authoritative advisory to the package and fixed version. CVE/USN/DSA enrichment is planned.
+APT security metadata is enriched on a best-effort basis with OSV records. The installed source-package version is queried first, and a vulnerability is attached only when the OSV affected package/ecosystem matches and the available candidate version is at or beyond a published fixed version. CVE aliases, advisory references and source-provided severity are shown when available. OSV lookup failures are non-fatal and do not invent severity; missing or unsupported severity remains `Unknown`.
 
 ## Package manager support
 
 | Package manager | Status |
 | --- | --- |
 | APT (Debian/Ubuntu) | Initial support |
-| DNF/YUM | Supported |
+| DNF5 | Supported (JSON update and advisory metadata) |\n| DNF4/YUM | Supported (text updateinfo metadata) |
 | APK | Planned |
 
 ## Configuration
@@ -128,7 +128,7 @@ The published `config/server-security-update-monitor.php` file controls:
 | `apt.update_timeout` | `300` | Maximum time in seconds allowed for the manual dashboard `apt-get update` action. |
 | `apt.security_suites` | `-security, /security` | Suite patterns considered security repositories. |\n| `apt.osv.enabled` | `true` | Enables best-effort Ubuntu/Debian OSV advisory enrichment. |\n| `apt.osv.timeout` | `5` | OSV HTTP request timeout in seconds. |
 | `dnf.enabled` | `true` | Enables automatic DNF/YUM detection. |
-| `dnf.binaries` | `/usr/bin/dnf`, `/usr/bin/yum`, `/bin/dnf`, `/bin/yum` | DNF/YUM executable candidates. |
+| `dnf.binaries` | `/usr/bin/dnf`, `/usr/bin/dnf5`, `/usr/bin/yum`, `/bin/dnf`, `/bin/dnf5`, `/bin/yum` | DNF/YUM executable candidates. |
 | `apk.enabled` | `true` | Reserved for the planned Alpine APK scanner. |
 
 ## Safety
