@@ -114,4 +114,27 @@ OUTPUT;
         );
     }
 
+
+    public function test_it_matches_security_advisories_to_the_exact_candidate_nevra(): void
+    {
+        $json = json_encode([[
+            'name' => 'RHSA-2026:1234',
+            'type' => 'security',
+            'severity' => 'Critical',
+            'nevra' => 'openssl-libs-1:3.2.2-6.el9_5.x86_64',
+            'references' => [],
+        ]], JSON_THROW_ON_ERROR);
+
+        $advisories = DnfUpdateScanner::parseAdvisoryJson($json);
+        $method = new \ReflectionMethod(DnfUpdateScanner::class, 'matchingAdvisory');
+
+        $matched = $method->invoke(null, $advisories['openssl-libs'], 'openssl-libs', '1:3.2.2-6.el9_5', 'x86_64');
+        $mismatched = $method->invoke(null, $advisories['openssl-libs'], 'openssl-libs', '1:3.2.2-5.el9_5', 'x86_64');
+        $wrongArchitecture = $method->invoke(null, $advisories['openssl-libs'], 'openssl-libs', '1:3.2.2-6.el9_5', 'aarch64');
+
+        $this->assertNotEmpty($matched);
+        $this->assertSame([], $mismatched);
+        $this->assertSame([], $wrongArchitecture);
+    }
+
 }
