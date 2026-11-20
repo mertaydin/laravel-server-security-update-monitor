@@ -31,10 +31,10 @@ class PackageManagerSmokeTest extends TestCase
             $this->assertTrue($metadata->successful());
             $this->assertGreaterThanOrEqual(2, count(explode("\t", trim($metadata->output()))));
 
-            $snapshot = (new AptUpdateScanner())->scan();
+            $snapshot = (new AptUpdateScanner)->scan();
             $this->assertSame('APT', $snapshot['package_manager']);
         } elseif (is_executable('/usr/bin/dnf') || is_executable('/usr/bin/dnf5') || is_executable('/usr/bin/yum')) {
-            $snapshot = (new DnfUpdateScanner())->scan();
+            $snapshot = (new DnfUpdateScanner)->scan();
             $this->assertContains($snapshot['package_manager'], ['DNF', 'DNF5', 'YUM']);
         } else {
             $this->markTestSkipped('No supported native package manager is installed in this environment.');
