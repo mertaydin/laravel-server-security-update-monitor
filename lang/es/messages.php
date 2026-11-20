@@ -31,7 +31,7 @@ return [
     'apt_update_success' => "Listas APT actualizadas. Seleccione Comprobar ahora para analizar con los metadatos recientes.",
     'apt_update_failed' => "No se pudieron actualizar las listas APT:",
     'updating_package_lists' => "Actualizando listas de paquetes APT",
-    'updating_package_lists_help' => "Actualizando los metadatos de los repositorios. Espere a que termine la operación."
+    'updating_package_lists_help' => "Actualizando los metadatos de los repositorios. Espere a que termine la operación.",
     'advisories' => "Avisos de seguridad",
     'cves' => "Registros CVE",
     'search_packages' => "Buscar paquete, CVE o aviso...",
