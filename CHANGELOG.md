@@ -1,3 +1,8 @@
+## v0.2.5 - 2026-11-21
+
+- Fix DNF/YUM executable discovery using the configured binary paths.
+- Fetch full Git history in the security workflow so changed-file formatting checks can compare the base commit reliably.
+
 ## v0.2.4 - 2026-11-20
 
 - Enrich Ubuntu and Debian APT package updates with OSV vulnerability records, CVE aliases and source references.
