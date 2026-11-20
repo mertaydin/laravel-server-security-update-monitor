@@ -137,4 +137,27 @@ OUTPUT;
         $this->assertSame([], $wrongArchitecture);
     }
 
+
+    public function test_it_parses_the_documented_dnf5_extended_json_field_names(): void
+    {
+        $json = json_encode([[
+            'advisory_name' => 'FEDORA-2026-abcdef1234',
+            'advisory_type' => 'security',
+            'advisory_severity' => 'Important',
+            'nevra' => 'openssl-libs-0:3.2.2-6.fc43.x86_64',
+            'references' => [
+                ['reference_id' => 'CVE-2026-12345', 'reference_type' => 'cve'],
+            ],
+        ]], JSON_THROW_ON_ERROR);
+
+        $result = DnfUpdateScanner::parseAdvisoryJson($json);
+
+        $this->assertSame(['FEDORA-2026-abcdef1234'], $result['openssl-libs']['advisory_ids']);
+        $this->assertSame('high', $result['openssl-libs']['severity']);
+        $this->assertSame(['CVE-2026-12345'], $result['openssl-libs']['cves']);
+        $this->assertSame(
+            ['https://bodhi.fedoraproject.org/updates/FEDORA-2026-abcdef1234'],
+            $result['openssl-libs']['advisory_urls']
+        );
+    }
 }
