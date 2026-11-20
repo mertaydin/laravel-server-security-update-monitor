@@ -1,3 +1,13 @@
+## v0.2.6 - 2026-11-21
+
+- Resolve OSV querybatch IDs to full vulnerability records, follow pagination and fetch each unique record once.
+- Use release-scoped OSV ecosystems for Ubuntu LTS and Debian, and query the installed source-package version from dpkg metadata.
+- Evaluate the complete ordered OSV version-event ranges with dpkg semantics before marking an APT candidate as fixed.
+- Preserve Ubuntu priority labels, including Negligible, and keep OSV advisory IDs and links aligned.
+- Add DNF5 JSON check-upgrade parsing and CVE-enabled advisory retrieval.
+- Match DNF4/DNF5 security advisories against the exact candidate NEVRA and architecture; correct Fedora advisory URLs.
+- Add native package-manager integration coverage for Ubuntu 24.04, Debian 12, Fedora DNF5 and Rocky Linux 9 DNF4.
+
 ## v0.2.5 - 2026-11-21
 
 - Fix DNF/YUM executable discovery using the configured binary paths.
