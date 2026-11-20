@@ -109,7 +109,8 @@ APT güvenlik metadata bilgileri mümkün olduğunda OSV kayıtlarıyla zenginle
 | Paket yöneticisi | Durum |
 | --- | --- |
 | APT (Debian/Ubuntu) | İlk destek |
-| DNF5 | Destekleniyor (JSON güncelleme ve duyuru metadata bilgisi) |\n| DNF4/YUM | Destekleniyor (metin tabanlı updateinfo metadata bilgisi) |
+| DNF5 | Destekleniyor (JSON güncelleme ve duyuru metadata bilgisi) |
+| DNF4/YUM | Destekleniyor (metin tabanlı updateinfo metadata bilgisi) |
 | APK | Planlandı |
 
 ## Yapılandırma
@@ -126,7 +127,9 @@ Yayımlanan `config/server-security-update-monitor.php` dosyası şu seçenekler
 | `command_timeout` | `30` | APT komutu zaman aşımı (saniye). |
 | `apt.enabled` | `true` | APT taramasını etkinleştirir. |
 | `apt.update_timeout` | `300` | Paneldeki manuel `apt-get update` işlemi için izin verilen en uzun süre (saniye). |
-| `apt.security_suites` | `-security, /security` | Güvenlik deposu kabul edilen suite kalıpları. |\n| `apt.osv.enabled` | `true` | Ubuntu/Debian OSV duyuru zenginleştirmesini etkinleştirir. |\n| `apt.osv.timeout` | `5` | OSV HTTP isteği zaman aşımı (saniye). |
+| `apt.security_suites` | `-security, /security` | Güvenlik deposu kabul edilen suite kalıpları. |
+| `apt.osv.enabled` | `true` | Ubuntu/Debian OSV duyuru zenginleştirmesini etkinleştirir. |
+| `apt.osv.timeout` | `5` | OSV HTTP isteği zaman aşımı (saniye). |
 | `dnf.enabled` | `true` | DNF/YUM otomatik algılamasını etkinleştirir. |
 | `dnf.binaries` | `/usr/bin/dnf`, `/usr/bin/dnf5`, `/usr/bin/yum`, `/bin/dnf`, `/bin/dnf5`, `/bin/yum` | DNF/YUM çalıştırılabilir dosya adayları. |
 | `apk.enabled` | `true` | Planlanan Alpine APK tarayıcısı için ayrılmıştır. |
