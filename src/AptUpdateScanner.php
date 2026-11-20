@@ -34,16 +34,18 @@ class AptUpdateScanner
             $suite = $matches[2];
             $security = $this->isSecuritySuite($suite);
             $installed = Process::timeout(10)->run([
-                '/usr/bin/dpkg-query', '-W', '-f=${Version}', '--', $name,
+                '/usr/bin/dpkg-query', '-W', '-f=${Version}\\t${source:Package}\\t${source:Version}', '--', $name,
             ]);
-            $source = Process::timeout(10)->run([
-                '/usr/bin/dpkg-query', '-W', '-f=${source:Package}', '--', $name,
-            ]);
+            $metadata = preg_split('/\\t/', trim($installed->output()));
+            $installedVersion = $installed->successful() && ! empty($metadata[0]) ? $metadata[0] : null;
+            $sourcePackage = ! empty($metadata[1]) ? $metadata[1] : $name;
+            $sourceVersion = ! empty($metadata[2]) ? $metadata[2] : $installedVersion;
 
             $packages[] = [
                 'name' => $name,
-                'source_package' => $source->successful() && trim($source->output()) !== '' ? trim($source->output()) : $name,
-                'installed_version' => $installed->successful() ? trim($installed->output()) : null,
+                'source_package' => $sourcePackage,
+                'source_version' => $sourceVersion,
+                'installed_version' => $installedVersion,
                 'candidate_version' => $matches[3],
                 'architecture' => $matches[4],
                 'repository' => $suite,
@@ -107,7 +109,7 @@ class AptUpdateScanner
 
             $queries[] = [
                 'package' => ['name' => $package['source_package'], 'ecosystem' => $ecosystem],
-                'version' => $package['installed_version'],
+                'version' => $package['source_version'] ?: $package['installed_version'],
             ];
             $packageIndexes[] = $index;
         }
