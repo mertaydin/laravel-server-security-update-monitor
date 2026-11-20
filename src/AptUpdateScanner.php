@@ -33,20 +33,32 @@ class AptUpdateScanner
             $name = $matches[1];
             $suite = $matches[2];
             $security = $this->isSecuritySuite($suite);
-            $installed = Process::timeout(10)->run('dpkg-query -W -f=${Version} '.escapeshellarg($name).' 2>/dev/null');
+            $installed = Process::timeout(10)->run([
+                '/usr/bin/dpkg-query', '-W', '-f=${Version}', '--', $name,
+            ]);
+            $source = Process::timeout(10)->run([
+                '/usr/bin/dpkg-query', '-W', '-f=${source:Package}', '--', $name,
+            ]);
 
             $packages[] = [
                 'name' => $name,
+                'source_package' => $source->successful() && trim($source->output()) !== '' ? trim($source->output()) : $name,
                 'installed_version' => $installed->successful() ? trim($installed->output()) : null,
                 'candidate_version' => $matches[3],
                 'architecture' => $matches[4],
                 'repository' => $suite,
                 'is_security' => $security,
                 'severity' => 'unknown',
-                'severity_label' => $security ? 'Security update; severity not verified' : 'No security advisory matched',
+                'severity_label' => $security ? 'Security update; severity not verified' : 'Unknown',
                 'type' => $security ? 'Security update' : 'Package update',
+                'advisory_ids' => [],
+                'cves' => [],
+                'advisory_urls' => [],
+                'advisory_source' => null,
             ];
         }
+
+        $this->enrichWithOsv($packages);
 
         usort($packages, fn ($a, $b) => [$b['is_security'], $a['name']] <=> [$a['is_security'], $b['name']]);
 
@@ -58,6 +70,140 @@ class AptUpdateScanner
             'security_updates' => count(array_filter($packages, fn ($package) => $package['is_security'])),
             'packages' => $packages,
         ];
+    }
+
+    /**
+     * Enrich installed package versions with Ubuntu/Debian OSV records.
+     * A network or feed failure is non-fatal; repository classification remains available.
+     */
+    private function enrichWithOsv(array &$packages): void
+    {
+        if (! config('server-security-update-monitor.apt.osv.enabled', true) || $packages === []) {
+            return;
+        }
+
+        $os = is_readable('/etc/os-release') ? parse_ini_file('/etc/os-release', false, INI_SCANNER_RAW) : [];
+        $id = strtolower((string) ($os['ID'] ?? ''));
+        $version = (string) ($os['VERSION_ID'] ?? '');
+        $ecosystem = null;
+
+        if ($id === 'ubuntu' && preg_match('/^\d+\.\d+$/', $version)) {
+            $ecosystem = 'Ubuntu-'.$version;
+        } elseif ($id === 'debian' && preg_match('/^(\d+)/', $version, $matches)) {
+            $ecosystem = 'Debian';
+            $version = $matches[1];
+        }
+
+        if ($ecosystem === null) {
+            return;
+        }
+
+        $queries = [];
+        $packageIndexes = [];
+        foreach ($packages as $index => $package) {
+            if (empty($package['installed_version'])) {
+                continue;
+            }
+
+            $queries[] = [
+                'package' => ['name' => $package['source_package'], 'ecosystem' => $ecosystem],
+                'version' => $package['installed_version'],
+            ];
+            $packageIndexes[] = $index;
+        }
+
+        if ($queries === []) {
+            return;
+        }
+
+        $timeout = max(1, (int) config('server-security-update-monitor.apt.osv.timeout', 5));
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'POST',
+                'header' => "Content-Type: application/json\r\nAccept: application/json\r\nUser-Agent: Laravel-Server-Security-Update-Monitor\r\n",
+                'content' => json_encode(['queries' => $queries], JSON_THROW_ON_ERROR),
+                'timeout' => $timeout,
+                'ignore_errors' => true,
+            ],
+        ]);
+
+        $response = @file_get_contents('https://api.osv.dev/v1/querybatch', false, $context);
+        if (! is_string($response)) {
+            return;
+        }
+
+        $decoded = json_decode($response, true);
+        if (! is_array($decoded) || ! is_array($decoded['results'] ?? null)) {
+            return;
+        }
+
+        foreach ($packageIndexes as $queryIndex => $packageIndex) {
+            $vulnerabilities = $decoded['results'][$queryIndex]['vulns'] ?? [];
+            foreach (is_array($vulnerabilities) ? $vulnerabilities : [] as $vulnerability) {
+                if (! is_array($vulnerability)) {
+                    continue;
+                }
+
+                $id = (string) ($vulnerability['id'] ?? '');
+                $aliases = array_values(array_filter((array) ($vulnerability['aliases'] ?? []), fn ($alias) => preg_match('/^CVE-\d{4}-\d{4,}$/i', (string) $alias) === 1));
+                $cves = array_values(array_unique(array_merge(
+                    preg_match('/^CVE-\d{4}-\d{4,}$/i', $id) ? [strtoupper($id)] : [],
+                    array_map('strtoupper', $aliases)
+                )));
+
+                $priority = 'unknown';
+                foreach ((array) ($vulnerability['severity'] ?? []) as $severity) {
+                    if (is_array($severity) && strtoupper((string) ($severity['type'] ?? '')) === 'UBUNTU') {
+                        $priority = $this->normalizeSeverity((string) ($severity['score'] ?? ''));
+                        break;
+                    }
+                }
+
+                $references = [];
+                foreach ((array) ($vulnerability['references'] ?? []) as $reference) {
+                    if (is_array($reference) && filter_var($reference['url'] ?? null, FILTER_VALIDATE_URL)) {
+                        $references[] = $reference['url'];
+                    }
+                }
+
+                $packages[$packageIndex]['is_security'] = true;
+                $packages[$packageIndex]['type'] = 'Security update';
+                $packages[$packageIndex]['advisory_source'] = 'OSV';
+                $packages[$packageIndex]['advisory_ids'] = array_values(array_unique(array_merge(
+                    $packages[$packageIndex]['advisory_ids'],
+                    $id !== '' ? [$id] : []
+                )));
+                $packages[$packageIndex]['cves'] = array_values(array_unique(array_merge($packages[$packageIndex]['cves'], $cves)));
+                $packages[$packageIndex]['advisory_urls'] = array_values(array_unique(array_merge($packages[$packageIndex]['advisory_urls'], $references)));
+
+                if ($priority !== 'unknown') {
+                    $packages[$packageIndex]['severity'] = $priority;
+                    $packages[$packageIndex]['severity_label'] = ucfirst($priority).' (Ubuntu)';
+                }
+            }
+        }
+    }
+
+    private function normalizeSeverity(string $severity): string
+    {
+        return match (strtolower(trim($severity))) {
+            'critical' => 'critical',
+            'high' => 'high',
+            'medium' => 'medium',
+            'low' => 'low',
+            default => 'unknown',
+        };
+    }
+
+    private function isSecuritySuite(string $suite): bool
+    {
+        foreach ((array) config('server-security-update-monitor.apt.security_suites', ['-security', '/security']) as $needle) {
+            if ($needle !== '' && str_contains(strtolower($suite), strtolower($needle))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -80,16 +226,5 @@ class AptUpdateScanner
             $details = trim($result->errorOutput() ?: $result->output());
             throw new RuntimeException('Unable to run apt-get update. Ensure the PHP process has permission to execute only /usr/bin/apt-get update. '.$details);
         }
-    }
-
-    private function isSecuritySuite(string $suite): bool
-    {
-        foreach ((array) config('server-security-update-monitor.apt.security_suites', ['-security', '/security']) as $needle) {
-            if ($needle !== '' && str_contains(strtolower($suite), strtolower($needle))) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
