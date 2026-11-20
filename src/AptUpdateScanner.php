@@ -171,9 +171,11 @@ class AptUpdateScanner
                     ?? ''
                 ));
 
+                $ubuntuPriority = '';
                 foreach ((array) ($vulnerability['severity'] ?? []) as $severity) {
                     if (is_array($severity) && strtoupper((string) ($severity['type'] ?? '')) === 'UBUNTU') {
-                        $priority = $this->normalizeSeverity((string) ($severity['score'] ?? ''));
+                        $ubuntuPriority = (string) ($severity['score'] ?? '');
+                        $priority = $this->normalizeSeverity($ubuntuPriority);
                         break;
                     }
                 }
@@ -197,7 +199,7 @@ class AptUpdateScanner
 
                 if ($priority !== 'unknown') {
                     $packages[$packageIndex]['severity'] = $priority;
-                    $packages[$packageIndex]['severity_label'] = strtolower((string) ($severity['score'] ?? '')) === 'negligible'
+                    $packages[$packageIndex]['severity_label'] = strtolower($ubuntuPriority) === 'negligible'
                         ? 'Negligible'
                         : ucfirst($priority);
                 }
