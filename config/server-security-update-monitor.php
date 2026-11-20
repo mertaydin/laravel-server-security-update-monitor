@@ -15,6 +15,10 @@ return [
         'enabled' => true,
         'update_timeout' => 300,
         'security_suites' => ['-security', '/security'],
+        'osv' => [
+            'enabled' => true,
+            'timeout' => 5,
+        ],
     ],
     'dnf' => [
         'enabled' => true,
