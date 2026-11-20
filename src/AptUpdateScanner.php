@@ -197,7 +197,9 @@ class AptUpdateScanner
 
                 if ($priority !== 'unknown') {
                     $packages[$packageIndex]['severity'] = $priority;
-                    $packages[$packageIndex]['severity_label'] = ucfirst($priority);
+                    $packages[$packageIndex]['severity_label'] = strtolower((string) ($severity['score'] ?? '')) === 'negligible'
+                        ? 'Negligible'
+                        : ucfirst($priority);
                 }
             }
         }
@@ -334,7 +336,7 @@ class AptUpdateScanner
             'critical' => 'critical',
             'important', 'high' => 'high',
             'moderate', 'medium' => 'medium',
-            'low', 'unimportant' => 'low',
+            'low', 'unimportant', 'negligible' => 'low',
             default => 'unknown',
         };
     }
