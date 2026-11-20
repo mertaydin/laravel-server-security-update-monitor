@@ -23,7 +23,7 @@ The screenshot is automatically recaptured from the real package dashboard in a 
 
 ## Dashboard
 
-The dashboard provides an at-a-glance view of pending updates and a package table with installed version, candidate version, repository suite, update classification and severity status.
+The dashboard provides an at-a-glance view of pending updates and a package table with installed/candidate versions, repository, update classification, vendor advisory IDs, CVE references and source-provided severity. Search and filter packages by update type or severity.
 
 - Total pending package updates.
 - Security-repository updates, separated from routine updates.
@@ -126,7 +126,7 @@ The published `config/server-security-update-monitor.php` file controls:
 | `command_timeout` | `30` | APT command timeout in seconds. |
 | `apt.enabled` | `true` | Enables APT scanning. |
 | `apt.update_timeout` | `300` | Maximum time in seconds allowed for the manual dashboard `apt-get update` action. |
-| `apt.security_suites` | `-security, /security` | Suite patterns considered security repositories. |
+| `apt.security_suites` | `-security, /security` | Suite patterns considered security repositories. |\n| `apt.osv.enabled` | `true` | Enables best-effort Ubuntu/Debian OSV advisory enrichment. |\n| `apt.osv.timeout` | `5` | OSV HTTP request timeout in seconds. |
 | `dnf.enabled` | `true` | Enables automatic DNF/YUM detection. |
 | `dnf.binaries` | `/usr/bin/dnf`, `/usr/bin/yum`, `/bin/dnf`, `/bin/yum` | DNF/YUM executable candidates. |
 | `apk.enabled` | `true` | Reserved for the planned Alpine APK scanner. |
