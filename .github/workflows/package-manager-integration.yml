@@ -30,7 +30,7 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
-      - name: Install PHP and Composer, then run against the native package manager
+      - name: Install PHP and Composer, then run native integration as an unprivileged user
         env:
           IMAGE: ${{ matrix.image }}
         run: |
@@ -43,7 +43,7 @@ jobs:
               set -euo pipefail
               if command -v apt-get >/dev/null 2>&1; then
                 apt-get update
-                apt-get install -y php-cli php-mbstring php-xml php-curl php-sqlite3 php-zip unzip composer
+                apt-get install -y php-cli php-mbstring php-xml php-curl php-sqlite3 php-zip unzip composer sudo
               else
                 dnf -y makecache
                 . /etc/os-release
@@ -52,9 +52,33 @@ jobs:
                   dnf -y module reset php
                   dnf -y module enable php:remi-8.2
                 fi
-                dnf -y install php-cli php-mbstring php-xml php-pdo php-sqlite3 php-curl unzip composer
+                dnf -y install php-cli php-mbstring php-xml php-pdo php-sqlite3 php-curl unzip composer sudo
                 dnf -y makecache
               fi
+
               composer install --no-interaction --prefer-dist
-              vendor/bin/phpunit tests/Integration
+              useradd --create-home --shell /bin/bash scanner
+              chown -R scanner:scanner /workspace
+
+              if command -v apt-get >/dev/null 2>&1; then
+                printf "%s\n" "scanner ALL=(root) NOPASSWD: /usr/bin/apt-get update" > /etc/sudoers.d/server-security-update-monitor
+                chmod 0440 /etc/sudoers.d/server-security-update-monitor
+                visudo -cf /etc/sudoers.d/server-security-update-monitor
+
+                if su -s /bin/bash scanner -c "sudo -n /usr/bin/apt-get upgrade"; then
+                  echo "ERROR: the scanner user unexpectedly received permission to run apt-get upgrade"
+                  exit 1
+                fi
+              else
+                set +e
+                su -s /bin/bash scanner -c "dnf -q --cacheonly check-upgrade --json" >/tmp/dnf-check-upgrade.json 2>&1
+                status=$?
+                set -e
+                if [ "$status" -ne 0 ] && [ "$status" -ne 100 ]; then
+                  cat /tmp/dnf-check-upgrade.json
+                  exit "$status"
+                fi
+              fi
+
+              su -s /bin/bash scanner -c "HOME=/home/scanner RUN_PRIVILEGE_INTEGRATION=1 vendor/bin/phpunit tests/Integration --do-not-cache-result"
             '
