@@ -23,7 +23,7 @@ Ekran görüntüsü GitHub Actions tarafından geçici bir Laravel uygulamasınd
 
 ## Panel
 
-Panel, bekleyen güncellemeleri ve kurulu sürüm, aday sürüm, depo suite bilgisi, güncelleme sınıflandırması ve önem durumunu içeren paket tablosunu özet olarak sunar.
+Panel, bekleyen güncellemeleri; kurulu/aday sürümleri, depo bilgisi, güncelleme sınıflandırması, üretici duyuru kimlikleri, CVE referansları ve kaynağın sağladığı önem derecesiyle birlikte gösterir. Paketler aranabilir ve güncelleme türü/önem derecesine göre filtrelenebilir.
 
 - Toplam bekleyen paket güncellemesi.
 - Rutin güncellemelerden ayrı gösterilen güvenlik deposu güncellemeleri.
@@ -126,7 +126,7 @@ Yayımlanan `config/server-security-update-monitor.php` dosyası şu seçenekler
 | `command_timeout` | `30` | APT komutu zaman aşımı (saniye). |
 | `apt.enabled` | `true` | APT taramasını etkinleştirir. |
 | `apt.update_timeout` | `300` | Paneldeki manuel `apt-get update` işlemi için izin verilen en uzun süre (saniye). |
-| `apt.security_suites` | `-security, /security` | Güvenlik deposu kabul edilen suite kalıpları. |
+| `apt.security_suites` | `-security, /security` | Güvenlik deposu kabul edilen suite kalıpları. |\n| `apt.osv.enabled` | `true` | Ubuntu/Debian OSV duyuru zenginleştirmesini etkinleştirir. |\n| `apt.osv.timeout` | `5` | OSV HTTP isteği zaman aşımı (saniye). |
 | `dnf.enabled` | `true` | DNF/YUM otomatik algılamasını etkinleştirir. |
 | `dnf.binaries` | `/usr/bin/dnf`, `/usr/bin/yum`, `/bin/dnf`, `/bin/yum` | DNF/YUM çalıştırılabilir dosya adayları. |
 | `apk.enabled` | `true` | Planlanan Alpine APK tarayıcısı için ayrılmıştır. |
