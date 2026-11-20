@@ -121,8 +121,8 @@ class AptUpdateScanner
         $pending = [];
 
         // OSV querybatch accepts at most 1,000 queries. Keep each request bounded.
-        foreach (array_chunk($queries, 500, true) as $chunk) {
-            $indexes = array_slice($packageIndexes, array_key_first($chunk), count($chunk));
+        foreach (array_chunk($queries, 500) as $chunkIndex => $chunk) {
+            $indexes = array_slice($packageIndexes, $chunkIndex * 500, count($chunk));
             $this->collectOsvIds($chunk, $indexes, $timeout, $idsByPackage);
         }
 
