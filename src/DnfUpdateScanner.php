@@ -188,7 +188,10 @@ class DnfUpdateScanner
 
         if ($id !== '' && ! in_array($id, $packages[$name]['advisory_ids'], true)) {
             $packages[$name]['advisory_ids'][] = $id;
-            $packages[$name]['advisory_urls'][] = 'https://access.redhat.com/errata/'.$id;
+            $url = self::advisoryUrl($id);
+            if ($url !== null) {
+                $packages[$name]['advisory_urls'][] = $url;
+            }
         }
 
         $packages[$name]['cves'] = array_values(array_unique(array_merge($packages[$name]['cves'], $cves)));
@@ -198,6 +201,23 @@ class DnfUpdateScanner
             $packages[$name]['severity'] = $severity;
             $packages[$name]['severity_label'] = ucfirst($severity);
         }
+    }
+
+    private static function advisoryUrl(string $id): ?string
+    {
+        if (preg_match('/^FEDORA-\\d{4}-/i', $id)) {
+            return 'https://bodhi.fedoraproject.org/updates/'.rawurlencode($id);
+        }
+
+        if (preg_match('/^(RHSA|RLSA)-/i', $id)) {
+            return 'https://access.redhat.com/errata/'.rawurlencode($id);
+        }
+
+        if (preg_match('/^ALAS-/', $id)) {
+            return 'https://alas.aws.amazon.com/'.rawurlencode($id).'.html';
+        }
+
+        return null;
     }
 
     private static function normalizeSeverity(string $severity): string
