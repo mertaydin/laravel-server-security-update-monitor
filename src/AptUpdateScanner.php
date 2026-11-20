@@ -151,6 +151,10 @@ class AptUpdateScanner
                     array_map('strtoupper', $aliases)
                 )));
 
+                if (! $this->candidateFixesVulnerability($packages[$packageIndex]['candidate_version'], $vulnerability)) {
+                    continue;
+                }
+
                 $priority = 'unknown';
                 foreach ((array) ($vulnerability['severity'] ?? []) as $severity) {
                     if (is_array($severity) && strtoupper((string) ($severity['type'] ?? '')) === 'UBUNTU') {
@@ -182,6 +186,37 @@ class AptUpdateScanner
                 }
             }
         }
+    }
+
+    private function candidateFixesVulnerability(string $candidateVersion, array $vulnerability): bool
+    {
+        $fixedVersions = [];
+
+        foreach ((array) ($vulnerability['affected'] ?? []) as $affected) {
+            foreach ((array) ($affected['ranges'] ?? []) as $range) {
+                foreach ((array) ($range['events'] ?? []) as $event) {
+                    if (isset($event['fixed']) && is_string($event['fixed']) && $event['fixed'] !== '') {
+                        $fixedVersions[] = $event['fixed'];
+                    }
+                }
+            }
+        }
+
+        if ($fixedVersions === []) {
+            return false;
+        }
+
+        foreach (array_unique($fixedVersions) as $fixedVersion) {
+            $comparison = Process::timeout(5)->run([
+                '/usr/bin/dpkg', '--compare-versions', $candidateVersion, 'ge', $fixedVersion,
+            ]);
+
+            if ($comparison->successful()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function normalizeSeverity(string $severity): string
