@@ -34,7 +34,7 @@ class DnfUpdateScanner
         }
 
         $timeout = (int) config('server-security-update-monitor.command_timeout', 30);
-        $jsonResult = Process::timeout($timeout)->run([$binary, '-q', 'check-upgrade', '--json']);
+        $jsonResult = Process::timeout($timeout)->run([$binary, '-q', '--cacheonly', 'check-upgrade', '--json']);
         $jsonPackages = null;
 
         // DNF5 exposes a documented machine-readable check-upgrade format.
@@ -46,7 +46,7 @@ class DnfUpdateScanner
         }
 
         if ($jsonPackages === null) {
-            $result = Process::timeout($timeout)->run([$binary, '-q', 'check-update']);
+            $result = Process::timeout($timeout)->run([$binary, '-q', '--cacheonly', 'check-update']);
 
             // DNF4/YUM return 100 when updates are available.
             if (! in_array($result->exitCode(), [0, 100], true)) {
@@ -268,7 +268,7 @@ class DnfUpdateScanner
     private function advisories(string $binary, int $timeout): array
     {
         // DNF5 documents this JSON output, including advisory ID, severity, NEVRA and CVE references.
-        $json = Process::timeout($timeout)->run([$binary, '-q', 'advisory', 'list', '--json', '--security', '--with-cve']);
+        $json = Process::timeout($timeout)->run([$binary, '-q', '--cacheonly', 'advisory', 'list', '--json', '--security', '--with-cve']);
         if ($json->successful()) {
             $parsed = self::parseAdvisoryJson($json->output());
             if ($parsed !== []) {
@@ -277,7 +277,7 @@ class DnfUpdateScanner
         }
 
         // DNF4/YUM and older DNF5 compatibility path.
-        $info = Process::timeout($timeout)->run([$binary, '-q', 'updateinfo', 'info', '--available', '--security']);
+        $info = Process::timeout($timeout)->run([$binary, '-q', '--cacheonly', 'updateinfo', 'info', '--available', '--security']);
 
         return $info->successful() ? self::parseAdvisoryInfo($info->output()) : [];
     }
