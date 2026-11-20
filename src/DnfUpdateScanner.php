@@ -288,10 +288,8 @@ class DnfUpdateScanner
 
         if ($id !== '' && ! in_array($id, $packages[$name]['advisory_ids'], true)) {
             $packages[$name]['advisory_ids'][] = $id;
-            $url = self::advisoryUrl($id);
-            if ($url !== null) {
-                $packages[$name]['advisory_urls'][] = $url;
-            }
+            // Keep one URL slot per advisory ID so dashboard indexes cannot drift.
+            $packages[$name]['advisory_urls'][] = self::advisoryUrl($id);
         }
 
         $packages[$name]['cves'] = array_values(array_unique(array_merge($packages[$name]['cves'], $cves)));
