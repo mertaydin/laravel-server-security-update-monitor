@@ -100,16 +100,16 @@ php artisan server-security-monitor:check
 
 ## Güvenlik sınıflandırması ve önem derecesi
 
-APT paketleri yalnızca depo suite bilgisi yapılandırılmış güvenlik suite kalıplarıyla (varsayılan olarak `-security` veya `/security`) eşleştiğinde güvenlik güncellemesi olarak işaretlenir. DNF/YUM paketleri yalnızca paket yöneticisinin kullanılabilir güvenlik duyuruları listesinde (`updateinfo list --available --security`) yer alıyorsa güvenlik güncellemesi sayılır. Duyuru metadata bilgisi okunamazsa paketlerin güvenlik güncellemesi olduğu tahmin edilmez. Daha yeni bir paket sürümü tek başına güvenlik açığı kanıtı değildir.
+APT paketleri yalnızca depo suite bilgisi yapılandırılmış güvenlik suite kalıplarıyla (varsayılan olarak `-security` veya `/security`) eşleştiğinde güvenlik güncellemesi olarak işaretlenir. DNF/YUM paketleri yalnızca kullanılabilir üretici güvenlik duyurularıyla eşleşiyorsa güvenlik güncellemesi sayılır. DNF5, CVE referanslarını içeren JSON duyuru arayüzünü; DNF4/YUM ise `updateinfo info --available --security` çıktısını kullanır. Duyuru metadata bilgisi okunamazsa paketlerin güvenlik güncellemesi olduğu tahmin edilmez. Daha yeni bir paket sürümü tek başına güvenlik açığı kanıtı değildir.
 
-**İlk sürümde önem derecesi özellikle bilinmiyor olarak gösterilir.** APT yükseltme listesi güvenilir CVSS puanları veya üretici duyuru önem derecesi sağlamaz. Paket, yetkili bir duyuru ile paket ve düzeltilmiş sürüm eşleştirilmeden güvenlik deposundaki her güncellemeyi Critical veya High olarak etiketlemez. CVE/USN/DSA zenginleştirmesi planlanmaktadır.
+APT güvenlik metadata bilgileri mümkün olduğunda OSV kayıtlarıyla zenginleştirilir. Önce kurulu kaynak paket sürümü sorgulanır; güvenlik açığı yalnızca OSV kaydındaki paket/ekosistem eşleştiğinde ve aday sürüm yayımlanmış düzeltilmiş sürüme ulaştığında ilişkilendirilir. Mevcutsa CVE takma adları, duyuru bağlantıları ve kaynağın sağladığı önem derecesi gösterilir. OSV erişim hataları taramayı durdurmaz; bilinmeyen önem derecesi tahmin edilmez.
 
 ## Paket yöneticisi desteği
 
 | Paket yöneticisi | Durum |
 | --- | --- |
 | APT (Debian/Ubuntu) | İlk destek |
-| DNF/YUM | Destekleniyor |
+| DNF5 | Destekleniyor (JSON güncelleme ve duyuru metadata bilgisi) |\n| DNF4/YUM | Destekleniyor (metin tabanlı updateinfo metadata bilgisi) |
 | APK | Planlandı |
 
 ## Yapılandırma
@@ -128,7 +128,7 @@ Yayımlanan `config/server-security-update-monitor.php` dosyası şu seçenekler
 | `apt.update_timeout` | `300` | Paneldeki manuel `apt-get update` işlemi için izin verilen en uzun süre (saniye). |
 | `apt.security_suites` | `-security, /security` | Güvenlik deposu kabul edilen suite kalıpları. |\n| `apt.osv.enabled` | `true` | Ubuntu/Debian OSV duyuru zenginleştirmesini etkinleştirir. |\n| `apt.osv.timeout` | `5` | OSV HTTP isteği zaman aşımı (saniye). |
 | `dnf.enabled` | `true` | DNF/YUM otomatik algılamasını etkinleştirir. |
-| `dnf.binaries` | `/usr/bin/dnf`, `/usr/bin/yum`, `/bin/dnf`, `/bin/yum` | DNF/YUM çalıştırılabilir dosya adayları. |
+| `dnf.binaries` | `/usr/bin/dnf`, `/usr/bin/dnf5`, `/usr/bin/yum`, `/bin/dnf`, `/bin/dnf5`, `/bin/yum` | DNF/YUM çalıştırılabilir dosya adayları. |
 | `apk.enabled` | `true` | Planlanan Alpine APK tarayıcısı için ayrılmıştır. |
 
 ## Güvenlik
