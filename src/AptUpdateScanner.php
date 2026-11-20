@@ -90,8 +90,8 @@ class AptUpdateScanner
 
         if ($id === 'ubuntu') {
             $ecosystem = $this->ubuntuOsvEcosystem($version);
-        } elseif ($id === 'debian' && preg_match('/^(\d+)/', $version, $matches)) {
-            $ecosystem = 'Debian';
+        } elseif ($id === 'debian') {
+            $ecosystem = $this->debianOsvEcosystem($version);
         }
 
         if ($ecosystem === null) {
@@ -291,6 +291,15 @@ class AptUpdateScanner
         $decoded = json_decode($response, true);
 
         return is_array($decoded) ? $decoded : null;
+    }
+
+    private function debianOsvEcosystem(string $version): ?string
+    {
+        if (! preg_match('/^(\d+)/', $version, $matches)) {
+            return null;
+        }
+
+        return 'Debian:'.$matches[1];
     }
 
     private function ubuntuOsvEcosystem(string $version): ?string
