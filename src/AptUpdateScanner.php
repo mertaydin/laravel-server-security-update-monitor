@@ -343,7 +343,9 @@ class AptUpdateScanner
 
                 foreach ((array) ($range['events'] ?? []) as $event) {
                     if (isset($event['introduced']) && is_string($event['introduced'])) {
-                        $rangeAffected = $this->dpkgVersionCompare($candidateVersion, 'ge', $event['introduced']);
+                        if ($this->dpkgVersionCompare($candidateVersion, 'ge', $event['introduced'])) {
+                            $rangeAffected = true;
+                        }
                     } elseif (isset($event['fixed']) && is_string($event['fixed'])) {
                         if ($this->dpkgVersionCompare($candidateVersion, 'ge', $event['fixed'])) {
                             $rangeAffected = false;
