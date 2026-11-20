@@ -69,6 +69,8 @@ OUTPUT;
         $result = DnfUpdateScanner::parseAdvisoryJson($json);
 
         $this->assertSame('unknown', $result['kernel-core']['severity']);
+        $this->assertSame(['VENDOR-123'], $result['kernel-core']['advisory_ids']);
+        $this->assertSame([null], $result['kernel-core']['advisory_urls']);
     }
 
     public function test_it_parses_dnf5_check_upgrade_json_and_ignores_obsoletes(): void
