@@ -32,4 +32,16 @@ return [
     'apt_update_failed' => "No se pudieron actualizar las listas APT:",
     'updating_package_lists' => "Actualizando listas de paquetes APT",
     'updating_package_lists_help' => "Actualizando los metadatos de los repositorios. Espere a que termine la operación."
+    'advisories' => "Avisos de seguridad",
+    'cves' => "Registros CVE",
+    'search_packages' => "Buscar paquete, CVE o aviso...",
+    'filter_updates' => "Tipo de actualización",
+    'filter_all' => "Todas las actualizaciones",
+    'filter_security' => "Solo seguridad",
+    'filter_normal' => "Solo normales",
+    'filter_severity' => "Gravedad",
+    'filter_severity_all' => "Todas las gravedades",
+    'unknown' => "Desconocida",
+    'no_filter_results' => "Ningún paquete coincide con los filtros.",
+    'disclaimer' => "La clasificación utiliza metadatos del repositorio APT y registros OSV coincidentes o avisos de proveedores DNF/YUM. La gravedad solo se muestra cuando la fuente la proporciona. Los paquetes nunca se actualizan automáticamente.",
 ];
