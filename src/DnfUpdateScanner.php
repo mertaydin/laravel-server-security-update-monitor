@@ -61,7 +61,7 @@ class DnfUpdateScanner
         if ($jsonPackages !== null) {
             foreach ($jsonPackages as $row) {
                 $name = $row['name'];
-                $advisory = $advisories[$name] ?? [];
+                $advisory = self::matchingAdvisory($advisories[$name] ?? [], $name, $row['version'], $row['architecture']);
                 $installed = Process::timeout(10)->run([
                     'rpm', '-q', '--qf', '%{VERSION}-%{RELEASE}.%{ARCH}', '--', $name,
                 ]);
@@ -95,7 +95,7 @@ class DnfUpdateScanner
             }
 
             $name = $matches[1];
-            $advisory = $advisories[$name] ?? [];
+            $advisory = self::matchingAdvisory($advisories[$name] ?? [], $name, $matches[3], $matches[2]);
             $installed = Process::timeout(10)->run([
                 'rpm', '-q', '--qf', '%{VERSION}-%{RELEASE}.%{ARCH}', '--', $name,
             ]);
@@ -215,7 +215,7 @@ class DnfUpdateScanner
                 }
             }
 
-            self::mergeAdvisory($packages, $name, $id, $severity, $cves);
+            self::mergeAdvisory($packages, $name, $id, $severity, $cves, $nevra);
         }
 
         return $packages;
@@ -236,7 +236,7 @@ class DnfUpdateScanner
                 foreach ($current['nevras'] as $nevra) {
                     $name = self::packageNameFromNevra($nevra);
                     if ($name !== null) {
-                        self::mergeAdvisory($packages, $name, $current['id'], self::normalizeSeverity($current['severity']), $current['cves']);
+                        self::mergeAdvisory($packages, $name, $current['id'], self::normalizeSeverity($current['severity']), $current['cves'], $nevra);
                     }
                 }
             }
@@ -282,14 +282,45 @@ class DnfUpdateScanner
         return $info->successful() ? self::parseAdvisoryInfo($info->output()) : [];
     }
 
-    private static function mergeAdvisory(array &$packages, string $name, string $id, string $severity, array $cves): void
+    private static function matchingAdvisory(array $advisory, string $packageName, string $candidateVersion, string $architecture): array
     {
-        $packages[$name] ??= ['severity' => 'unknown', 'severity_label' => 'Unknown', 'advisory_ids' => [], 'cves' => [], 'advisory_urls' => []];
+        if ($advisory === [] || empty($advisory['nevras'])) {
+            return [];
+        }
+
+        foreach ($advisory['nevras'] as $nevra) {
+            if (self::packageNameFromNevra((string) $nevra) !== $packageName) {
+                continue;
+            }
+
+            $separator = strrpos((string) $nevra, '.');
+            if ($separator === false || substr((string) $nevra, $separator + 1) !== $architecture) {
+                continue;
+            }
+
+            $evr = substr((string) $nevra, strlen($packageName) + 1, $separator - strlen($packageName) - 1);
+            $normalizeEpoch = static fn (string $version): string => str_starts_with($version, '0:') ? substr($version, 2) : $version;
+
+            if ($normalizeEpoch($evr) === $normalizeEpoch($candidateVersion)) {
+                return $advisory;
+            }
+        }
+
+        return [];
+    }
+
+    private static function mergeAdvisory(array &$packages, string $name, string $id, string $severity, array $cves, string $nevra = ''): void
+    {
+        $packages[$name] ??= ['severity' => 'unknown', 'severity_label' => 'Unknown', 'advisory_ids' => [], 'cves' => [], 'advisory_urls' => [], 'nevras' => []];
 
         if ($id !== '' && ! in_array($id, $packages[$name]['advisory_ids'], true)) {
             $packages[$name]['advisory_ids'][] = $id;
             // Keep one URL slot per advisory ID so dashboard indexes cannot drift.
             $packages[$name]['advisory_urls'][] = self::advisoryUrl($id);
+        }
+
+        if ($nevra !== '' && ! in_array($nevra, $packages[$name]['nevras'], true)) {
+            $packages[$name]['nevras'][] = $nevra;
         }
 
         $packages[$name]['cves'] = array_values(array_unique(array_merge($packages[$name]['cves'], $cves)));
