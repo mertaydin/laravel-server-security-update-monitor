@@ -41,6 +41,16 @@ class PackageManagerSmokeTest extends TestCase
         } elseif (is_executable('/usr/bin/dnf') || is_executable('/usr/bin/dnf5') || is_executable('/usr/bin/yum')) {
             $snapshot = (new DnfUpdateScanner)->scan();
             $this->assertContains($snapshot['package_manager'], ['DNF', 'DNF5', 'YUM']);
+
+            $binary = is_executable('/usr/bin/dnf') ? '/usr/bin/dnf' : (is_executable('/usr/bin/dnf5') ? '/usr/bin/dnf5' : '/usr/bin/yum');
+            $advisories = Process::run([$binary, '-q', '--cacheonly', 'advisory', 'list', '--json', '--security', '--with-cve']);
+            if (! $advisories->successful()) {
+                $advisories = Process::run([$binary, '-q', '--cacheonly', 'updateinfo', 'info', '--available', '--security']);
+            }
+            $this->assertTrue(
+                $advisories->successful(),
+                'The native package manager could not read cached security advisory metadata: '.$advisories->errorOutput()
+            );
         } else {
             $this->markTestSkipped('No supported native package manager is installed in this environment.');
         }
