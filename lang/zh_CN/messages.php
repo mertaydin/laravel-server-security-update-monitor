@@ -32,4 +32,16 @@ return [
     'apt_update_failed' => "无法更新 APT 软件包列表：",
     'updating_package_lists' => "正在更新 APT 软件包列表",
     'updating_package_lists_help' => "正在刷新软件源元数据，请等待操作完成。"
+    'advisories' => "安全公告",
+    'cves' => "CVE 记录",
+    'search_packages' => "搜索软件包、CVE 或公告...",
+    'filter_updates' => "更新类型",
+    'filter_all' => "所有更新",
+    'filter_security' => "仅安全更新",
+    'filter_normal' => "仅常规更新",
+    'filter_severity' => "严重程度",
+    'filter_severity_all' => "所有严重程度",
+    'unknown' => "未知",
+    'no_filter_results' => "没有符合筛选条件的软件包。",
+    'disclaimer' => "安全分类依据 APT 软件源元数据、匹配的 OSV 记录或 DNF/YUM 供应商公告。仅当来源提供严重程度时才会显示。不会自动升级软件包。",
 ];
