@@ -1,3 +1,12 @@
+## v0.2.4 - 2026-11-20
+
+- Enrich Ubuntu and Debian APT package updates with OSV vulnerability records, CVE aliases and source references.
+- Require an OSV fixed-version match against the APT candidate version before attaching a vulnerability record to an update.
+- Parse DNF5 JSON security advisories and DNF4/YUM updateinfo details, including advisory IDs, CVEs and vendor severity.
+- Add severity mapping for Critical, Important/High, Moderate/Medium and Low while preserving Unknown when source metadata is incomplete.
+- Expand the dashboard with advisory/CVE links, package search, update-type filters and severity filters.
+- Add parser regression tests and document the supported advisory data sources.
+
 ## v0.2.3 - 2026-11-19
 
 - Show a hand cursor when hovering dashboard action buttons, including the APT package-list update button.
