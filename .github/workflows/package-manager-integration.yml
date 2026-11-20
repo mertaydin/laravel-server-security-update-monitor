@@ -46,11 +46,8 @@ jobs:
                 apt-get install -y php-cli php-mbstring php-xml php-curl php-sqlite3 php-zip unzip composer
               else
                 dnf -y makecache
-                if grep -qi '^ID=rocky
-              composer install --no-interaction --prefer-dist
-              vendor/bin/phpunit tests/Integration
-            '
- /etc/os-release; then
+                . /etc/os-release
+                if [ "$ID" = rocky ]; then
                   dnf -y install epel-release https://rpms.remirepo.net/enterprise/remi-release-9.rpm
                   dnf -y module reset php
                   dnf -y module enable php:remi-8.2
