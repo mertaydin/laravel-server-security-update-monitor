@@ -54,6 +54,7 @@ class AptUpdateScanner
                 'advisory_ids' => [],
                 'cves' => [],
                 'advisory_urls' => [],
+                'reference_urls' => [],
                 'advisory_source' => null,
             ];
         }
@@ -188,12 +189,12 @@ class AptUpdateScanner
                 $packages[$packageIndex]['is_security'] = true;
                 $packages[$packageIndex]['type'] = 'Security update';
                 $packages[$packageIndex]['advisory_source'] = 'OSV';
-                $packages[$packageIndex]['advisory_ids'] = array_values(array_unique(array_merge(
-                    $packages[$packageIndex]['advisory_ids'],
-                    $vulnerabilityId !== '' ? [$vulnerabilityId] : []
-                )));
+                if ($vulnerabilityId !== '' && ! in_array($vulnerabilityId, $packages[$packageIndex]['advisory_ids'], true)) {
+                    $packages[$packageIndex]['advisory_ids'][] = $vulnerabilityId;
+                    $packages[$packageIndex]['advisory_urls'][] = 'https://osv.dev/vulnerability/'.rawurlencode($vulnerabilityId);
+                }
                 $packages[$packageIndex]['cves'] = array_values(array_unique(array_merge($packages[$packageIndex]['cves'], $cves)));
-                $packages[$packageIndex]['advisory_urls'] = array_values(array_unique(array_merge($packages[$packageIndex]['advisory_urls'], $references)));
+                $packages[$packageIndex]['reference_urls'] = array_values(array_unique(array_merge($packages[$packageIndex]['reference_urls'], $references)));
 
                 if ($priority !== 'unknown') {
                     $packages[$packageIndex]['severity'] = $priority;
