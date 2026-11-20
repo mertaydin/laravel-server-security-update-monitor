@@ -23,6 +23,8 @@ jobs:
             manager: APT / Debian 12
           - image: fedora:latest
             manager: DNF5 / Fedora
+          - image: rockylinux:9
+            manager: DNF4 / Rocky Linux 9
     name: ${{ matrix.manager }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -44,6 +46,15 @@ jobs:
                 apt-get install -y php-cli php-mbstring php-xml php-curl php-sqlite3 php-zip unzip composer
               else
                 dnf -y makecache
+                if grep -qi '^ID=rocky
+              composer install --no-interaction --prefer-dist
+              vendor/bin/phpunit tests/Integration
+            '
+ /etc/os-release; then
+                  dnf -y install epel-release https://rpms.remirepo.net/enterprise/remi-release-9.rpm
+                  dnf -y module reset php
+                  dnf -y module enable php:remi-8.2
+                fi
                 dnf -y install php-cli php-mbstring php-xml php-pdo php-sqlite3 php-curl unzip composer
                 dnf -y makecache
               fi
