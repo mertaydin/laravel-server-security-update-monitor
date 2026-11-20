@@ -88,11 +88,10 @@ class AptUpdateScanner
         $version = (string) ($os['VERSION_ID'] ?? '');
         $ecosystem = null;
 
-        if ($id === 'ubuntu' && preg_match('/^\d+\.\d+$/', $version)) {
-            $ecosystem = 'Ubuntu-'.$version;
+        if ($id === 'ubuntu') {
+            $ecosystem = $this->ubuntuOsvEcosystem($version);
         } elseif ($id === 'debian' && preg_match('/^(\d+)/', $version, $matches)) {
             $ecosystem = 'Debian';
-            $version = $matches[1];
         }
 
         if ($ecosystem === null) {
@@ -288,6 +287,18 @@ class AptUpdateScanner
         $decoded = json_decode($response, true);
 
         return is_array($decoded) ? $decoded : null;
+    }
+
+    private function ubuntuOsvEcosystem(string $version): ?string
+    {
+        if (! preg_match('/^\d+\.\d+$/', $version)) {
+            return null;
+        }
+
+        // Ubuntu's OSV ecosystem identifiers explicitly mark LTS releases.
+        $ltsReleases = ['14.04', '16.04', '18.04', '20.04', '22.04', '24.04', '26.04'];
+
+        return 'Ubuntu:'.$version.(in_array($version, $ltsReleases, true) ? ':LTS' : '');
     }
 
     private function candidateFixesVulnerability(string $packageName, string $ecosystem, string $candidateVersion, array $vulnerability): bool
