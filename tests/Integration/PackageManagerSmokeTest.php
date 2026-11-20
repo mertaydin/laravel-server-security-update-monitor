@@ -2,10 +2,10 @@
 
 namespace MertAydin\ServerSecurityUpdateMonitor\Tests\Integration;
 
+use Illuminate\Support\Facades\Process;
 use MertAydin\ServerSecurityUpdateMonitor\AptUpdateScanner;
 use MertAydin\ServerSecurityUpdateMonitor\DnfUpdateScanner;
 use MertAydin\ServerSecurityUpdateMonitor\ServerSecurityUpdateMonitorServiceProvider;
-use Illuminate\Support\Facades\Process;
 use Orchestra\Testbench\TestCase;
 
 class PackageManagerSmokeTest extends TestCase
