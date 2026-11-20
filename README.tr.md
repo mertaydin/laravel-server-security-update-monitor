@@ -96,7 +96,7 @@ Manuel tarama başlatın:
 php artisan server-security-monitor:check
 ```
 
-**Şimdi Kontrol Et** işlemi sunucuda zaten bulunan paket indekslerini kullanır ve `apt-get update` çalıştırmaz. APT sistemlerinde depo metadata bilgilerini yenilemek istediğinizde ayrı **Paket Listelerini Güncelle** panel düğmesini kullanın. Yenileme bağımsız olarak tamamlanır; ardından yeni metadata ile tarama yapmak için **Şimdi Kontrol Et** seçeneğini kullanın.
+**Şimdi Kontrol Et** işlemi salt okunurdur. APT taramaları sunucudaki mevcut paket indekslerini kullanır ve `apt-get update` çalıştırmaz; DNF/YUM taramaları `--cacheonly` kullanır ve depo metadata bilgisini yenilemez. APT sistemlerinde depo metadata bilgilerini yenilemek istediğinizde ayrı **Paket Listelerini Güncelle** panel düğmesini kullanın. DNF/YUM sistemlerinde taramadan önce metadata bilgisini normal ayrıcalıklı bakım sürecinizle (örneğin root tarafından çalışan bir systemd zamanlayıcısından `dnf makecache` ile) yenileyin. DNF/YUM metadata yenilemesi için monitörün root erişimine ihtiyacı yoktur.
 
 ## Güvenlik sınıflandırması ve önem derecesi
 
@@ -137,7 +137,7 @@ Yayımlanan `config/server-security-update-monitor.php` dosyası şu seçenekler
 ## Güvenlik
 
 - Yalnızca salt okunur paket incelemesi yapılır.
-- APT metadata yenilemesi yalnızca ayrı panel işlemi açıkça seçildiğinde çalışır. Tarama hiçbir zaman `apt-get update` çalıştırmaz. Yenileme işlemi yalnızca `apt-get update` komutunu çalıştırır; `apt upgrade`, `apt install`, `dnf upgrade`, `yum update`, `apk upgrade` veya herhangi bir paket kurma/kaldırma komutunu çalıştırmaz.
+- APT metadata yenilemesi yalnızca ayrı panel işlemi açıkça seçildiğinde çalışır. Tarama hiçbir zaman `apt-get update` çalıştırmaz. DNF/YUM taramaları `--cacheonly` kullanır ve depo metadata bilgisini yenilemez. DNF/YUM metadata bilgisini `dnf makecache` gibi root tarafından yürütülen ayrı bir bakım göreviyle yenileyin. APT yenileme işlemi yalnızca `apt-get update` komutunu çalıştırır; `apt upgrade`, `apt install`, `dnf upgrade`, `yum update`, `apk upgrade` veya herhangi bir paket kurma/kaldırma komutunu çalıştırmaz.
 - Paket kurmaz, kaldırmaz veya yükseltmez.
 - Depo adlarından veya sürüm numaralarından CVSS önem derecesi çıkarımı yapmaz.
 
