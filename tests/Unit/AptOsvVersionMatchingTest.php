@@ -42,4 +42,33 @@ class AptOsvVersionMatchingTest extends TestCase
         $this->assertTrue($method->invoke($scanner, 'openssl', 'Ubuntu:24.04:LTS', '2.6', $vulnerability));
         $this->assertFalse($method->invoke($scanner, 'libssl3', 'Ubuntu:24.04:LTS', '2.6', $vulnerability));
     }
+
+    public function test_it_matches_a_release_scoped_debian_osv_record_with_dpkg_versions(): void
+    {
+        // Based on the published DEBIAN-CVE-2026-74363 record for Debian 12/linux.
+        $vulnerability = [
+            'id' => 'DEBIAN-CVE-2026-74363',
+            'affected' => [[
+                'package' => [
+                    'name' => 'linux',
+                    'ecosystem' => 'Debian:12',
+                ],
+                'ranges' => [[
+                    'type' => 'ECOSYSTEM',
+                    'events' => [
+                        ['introduced' => '0'],
+                        ['fixed' => '6.1.180-1'],
+                    ],
+                ]],
+                'versions' => ['6.1.176-1'],
+            ]],
+        ];
+
+        $method = new \ReflectionMethod(AptUpdateScanner::class, 'candidateFixesVulnerability');
+        $scanner = new AptUpdateScanner;
+
+        $this->assertFalse($method->invoke($scanner, 'linux', 'Debian:12', '6.1.176-1', $vulnerability));
+        $this->assertTrue($method->invoke($scanner, 'linux', 'Debian:12', '6.1.180-1', $vulnerability));
+        $this->assertTrue($method->invoke($scanner, 'linux', 'Debian:12', '6.1.181-1', $vulnerability));
+    }
 }
