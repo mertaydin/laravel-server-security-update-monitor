@@ -43,7 +43,7 @@ jobs:
               set -euo pipefail
               if command -v apt-get >/dev/null 2>&1; then
                 apt-get update
-                apt-get install -y php-cli php-mbstring php-xml php-curl php-sqlite3 php-zip unzip composer sudo
+                apt-get install -y php-cli php-mbstring php-xml php-curl php-sqlite3 php-zip unzip composer sudo util-linux
               else
                 dnf -y makecache
                 . /etc/os-release
@@ -52,7 +52,7 @@ jobs:
                   dnf -y module reset php
                   dnf -y module enable php:remi-8.2
                 fi
-                dnf -y install php-cli php-mbstring php-xml php-pdo php-sqlite3 php-curl unzip composer sudo
+                dnf -y install php-cli php-mbstring php-xml php-pdo php-sqlite3 php-curl unzip composer sudo util-linux shadow-utils
                 dnf -y makecache
               fi
 
@@ -65,13 +65,13 @@ jobs:
                 chmod 0440 /etc/sudoers.d/server-security-update-monitor
                 visudo -cf /etc/sudoers.d/server-security-update-monitor
 
-                if su -s /bin/bash scanner -c "sudo -n /usr/bin/apt-get upgrade"; then
+                if runuser -u scanner -- sudo -n /usr/bin/apt-get upgrade; then
                   echo "ERROR: the scanner user unexpectedly received permission to run apt-get upgrade"
                   exit 1
                 fi
               else
                 set +e
-                su -s /bin/bash scanner -c "dnf -q --cacheonly check-upgrade --json" >/tmp/dnf-check-upgrade.json 2>&1
+                runuser -u scanner -- dnf -q --cacheonly check-upgrade --json >/tmp/dnf-check-upgrade.json 2>&1
                 status=$?
                 set -e
                 if [ "$status" -ne 0 ] && [ "$status" -ne 100 ]; then
@@ -80,5 +80,5 @@ jobs:
                 fi
               fi
 
-              su -s /bin/bash scanner -c "HOME=/home/scanner RUN_PRIVILEGE_INTEGRATION=1 vendor/bin/phpunit tests/Integration --do-not-cache-result"
+              runuser -u scanner -- env HOME=/home/scanner RUN_PRIVILEGE_INTEGRATION=1 vendor/bin/phpunit tests/Integration --do-not-cache-result
             '
