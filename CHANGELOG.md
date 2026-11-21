@@ -1,5 +1,7 @@
 ## Unreleased
 
+## v0.2.7 - 2026-11-21
+
 - Run DNF5, DNF4 and YUM update/advisory queries with `--cacheonly`, allowing read-only scans under an unprivileged PHP-FPM account without refreshing package metadata.
 - Expand native integration tests to run as a dedicated unprivileged user on Ubuntu 24.04, Debian 12, Fedora DNF5 and Rocky Linux 9 DNF4.
 - Validate the exact APT sudoers boundary: allow only `/usr/bin/apt-get update`, verify the command with `visudo`, and assert that `apt-get upgrade` remains denied.
