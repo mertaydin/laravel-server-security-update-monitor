@@ -1,3 +1,8 @@
+## v0.2.8 - 2026-11-22
+
+- Add `barryvdh/laravel-ide-helper` as a development dependency, selecting a compatible release for the supported Laravel versions.
+- Run Laravel Pint across the PHP codebase and add an automated formatting workflow.
+
 ## Unreleased
 
 ## v0.2.7 - 2026-11-21
