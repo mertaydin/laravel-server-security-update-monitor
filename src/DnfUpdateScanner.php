@@ -83,38 +83,38 @@ class DnfUpdateScanner
             }
         } else {
             foreach ($lines as $line) {
-            $line = trim($line);
+                $line = trim($line);
 
-            if ($line === '' || str_starts_with($line, 'Last metadata expiration check')
-                || str_starts_with($line, 'Obsoleting Packages')) {
-                continue;
-            }
+                if ($line === '' || str_starts_with($line, 'Last metadata expiration check')
+                    || str_starts_with($line, 'Obsoleting Packages')) {
+                    continue;
+                }
 
-            if (! preg_match('/^(.+)\.([A-Za-z0-9_]+)\s+(\S+)\s+(\S+)$/', $line, $matches)) {
-                continue;
-            }
+                if (! preg_match('/^(.+)\.([A-Za-z0-9_]+)\s+(\S+)\s+(\S+)$/', $line, $matches)) {
+                    continue;
+                }
 
-            $name = $matches[1];
-            $advisory = self::matchingAdvisory($advisories[$name] ?? [], $name, $matches[3], $matches[2]);
-            $installed = Process::timeout(10)->run([
-                'rpm', '-q', '--qf', '%{VERSION}-%{RELEASE}.%{ARCH}', '--', $name,
-            ]);
+                $name = $matches[1];
+                $advisory = self::matchingAdvisory($advisories[$name] ?? [], $name, $matches[3], $matches[2]);
+                $installed = Process::timeout(10)->run([
+                    'rpm', '-q', '--qf', '%{VERSION}-%{RELEASE}.%{ARCH}', '--', $name,
+                ]);
 
-            $packages[] = [
-                'name' => $name,
-                'installed_version' => $installed->successful() ? trim($installed->output()) : null,
-                'candidate_version' => $matches[3],
-                'architecture' => $matches[2],
-                'repository' => $matches[4],
-                'is_security' => ! empty($advisory),
-                'severity' => $advisory['severity'] ?? 'unknown',
-                'severity_label' => $advisory['severity_label'] ?? 'Unknown',
-                'type' => ! empty($advisory) ? 'Security update' : 'Package update',
-                'advisory_ids' => $advisory['advisory_ids'] ?? [],
-                'cves' => $advisory['cves'] ?? [],
-                'advisory_urls' => $advisory['advisory_urls'] ?? [],
-                'advisory_source' => ! empty($advisory) ? 'DNF/YUM updateinfo' : null,
-            ];
+                $packages[] = [
+                    'name' => $name,
+                    'installed_version' => $installed->successful() ? trim($installed->output()) : null,
+                    'candidate_version' => $matches[3],
+                    'architecture' => $matches[2],
+                    'repository' => $matches[4],
+                    'is_security' => ! empty($advisory),
+                    'severity' => $advisory['severity'] ?? 'unknown',
+                    'severity_label' => $advisory['severity_label'] ?? 'Unknown',
+                    'type' => ! empty($advisory) ? 'Security update' : 'Package update',
+                    'advisory_ids' => $advisory['advisory_ids'] ?? [],
+                    'cves' => $advisory['cves'] ?? [],
+                    'advisory_urls' => $advisory['advisory_urls'] ?? [],
+                    'advisory_source' => ! empty($advisory) ? 'DNF/YUM updateinfo' : null,
+                ];
             }
         }
 

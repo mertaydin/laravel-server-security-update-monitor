@@ -114,7 +114,6 @@ OUTPUT;
         );
     }
 
-
     public function test_it_matches_security_advisories_to_the_exact_candidate_nevra(): void
     {
         $json = json_encode([[
@@ -136,7 +135,6 @@ OUTPUT;
         $this->assertSame([], $mismatched);
         $this->assertSame([], $wrongArchitecture);
     }
-
 
     public function test_it_parses_the_documented_dnf5_extended_json_field_names(): void
     {

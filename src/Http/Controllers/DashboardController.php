@@ -4,8 +4,8 @@ namespace MertAydin\ServerSecurityUpdateMonitor\Http\Controllers;
 
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
-use MertAydin\ServerSecurityUpdateMonitor\SystemUpdateScanner;
 use MertAydin\ServerSecurityUpdateMonitor\AptUpdateScanner;
+use MertAydin\ServerSecurityUpdateMonitor\SystemUpdateScanner;
 
 class DashboardController extends Controller
 {
@@ -45,6 +45,7 @@ class DashboardController extends Controller
     {
         try {
             $scanner->updatePackageLists();
+
             return redirect()->route('server-security-update-monitor.dashboard')->with('apt_update_status', 'success');
         } catch (\Throwable $exception) {
             return redirect()->route('server-security-update-monitor.dashboard')
