@@ -137,3 +137,42 @@
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initializeUpdateCommandCopy, {once: true});
     else initializeUpdateCommandCopy();
 })();
+
+/* Export the currently filtered package rows; no additional package-manager calls are made. */
+(function () {
+    'use strict';
+    function initializePackageExport() {
+        var toolbar = document.querySelector('.toolbar'), body = document.getElementById('package-table-body');
+        if (!toolbar || !body || toolbar.querySelector('[data-export-package-report]')) return;
+        ['csv', 'json'].forEach(function (format) {
+            var button = document.createElement('button');
+            button.type = 'button'; button.className = 'btn';
+            button.dataset.exportPackageReport = format; button.textContent = 'Export ' + format.toUpperCase();
+            button.addEventListener('click', function () {
+                var rows = Array.prototype.filter.call(body.querySelectorAll('tr'), function (row) { return !row.hidden; });
+                var data = rows.map(function (row) {
+                    var cells = Array.prototype.map.call(row.querySelectorAll('td'), function (cell) { return cell.textContent.trim().replace(/\s+/g, ' '); });
+                    return {package:cells[0] || '', installed_version:cells[1] || '', candidate_version:cells[2] || '', repository:cells[3] || '', update_type:cells[4] || '', severity:cells[5] || '', advisories:cells[6] || '', cves:cells[7] || ''};
+                });
+                var content, mime;
+                if (format === 'json') {
+                    content = JSON.stringify({generated_at:new Date().toISOString(),package_manager:(document.querySelector('.top .sub')?.textContent || ''),packages:data}, null, 2);
+                    mime = 'application/json;charset=utf-8';
+                } else {
+                    var columns = ['package','installed_version','candidate_version','repository','update_type','severity','advisories','cves'];
+                    var quote = value => '"' + String(value ?? '').replace(/"/g, '""') + '"';
+                    content = [columns.join(','), ...data.map(row => columns.map(column => quote(row[column])).join(','))].join('\r\n');
+                    mime = 'text/csv;charset=utf-8';
+                }
+                var blob = new Blob(['\ufeff' + content], {type:mime});
+                var url = URL.createObjectURL(blob), link = document.createElement('a');
+                link.href = url;
+                link.download = 'server-security-updates-' + new Date().toISOString().replace(/[:.]/g, '-') + '.' + format;
+                document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url);
+            });
+            toolbar.appendChild(button);
+        });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initializePackageExport, {once:true});
+    else initializePackageExport();
+})();
