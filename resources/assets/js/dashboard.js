@@ -94,3 +94,46 @@
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initializeDashboard, { once: true });
     else initializeDashboard();
 })();
+
+/* Copy-only package upgrade guidance. This never executes a package-manager command. */
+(function () {
+    'use strict';
+    function initializeUpdateCommandCopy() {
+        var toolbar = document.querySelector('.toolbar');
+        if (!toolbar || toolbar.querySelector('[data-copy-update-command]')) return;
+        var manager = (document.querySelector('.top .sub')?.textContent || '').toUpperCase();
+        var command;
+        if (manager.indexOf('APT') !== -1) command = 'sudo apt-get upgrade';
+        else if (manager.indexOf('DNF5') !== -1 || manager.indexOf('DNF') !== -1) command = 'sudo dnf upgrade';
+        else if (manager.indexOf('YUM') !== -1) command = 'sudo yum update';
+        else return;
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'btn';
+        button.dataset.copyUpdateCommand = 'true';
+        button.textContent = 'Copy update command';
+        button.addEventListener('click', async function () {
+            try {
+                if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(command);
+                else {
+                    var field = document.createElement('textarea');
+                    field.value = command;
+                    field.style.position = 'fixed';
+                    field.style.opacity = '0';
+                    document.body.appendChild(field);
+                    field.select();
+                    var copied = document.execCommand('copy');
+                    field.remove();
+                    if (!copied) throw new Error('Clipboard unavailable');
+                }
+                button.textContent = 'Copied: ' + command;
+            } catch (error) {
+                button.textContent = 'Copy failed';
+            }
+            window.setTimeout(function () { button.textContent = 'Copy update command'; }, 2200);
+        });
+        toolbar.appendChild(button);
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initializeUpdateCommandCopy, {once: true});
+    else initializeUpdateCommandCopy();
+})();
