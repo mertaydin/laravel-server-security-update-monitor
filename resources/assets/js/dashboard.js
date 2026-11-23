@@ -101,7 +101,8 @@
     function initializeUpdateCommandCopy() {
         var toolbar = document.querySelector('.toolbar');
         if (!toolbar || toolbar.querySelector('[data-copy-update-command]')) return;
-        var manager = (document.querySelector('.top .sub')?.textContent || '').toUpperCase();
+        var metadata = (document.querySelector('.top .sub')?.textContent || '').split('·');
+        var manager = (metadata.length > 1 ? metadata[1] : '').trim().toUpperCase();
         var command;
         if (manager.indexOf('APT') !== -1) command = 'sudo apt-get upgrade';
         else if (manager.indexOf('DNF5') !== -1 || manager.indexOf('DNF') !== -1) command = 'sudo dnf upgrade';
